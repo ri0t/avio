@@ -21,7 +21,9 @@ import pygame
 
 from circuits import Component, Timer, Event
 
-from .events import joystickchange, quit, guiresize
+from .events import joystickchange, guiquit, guiresize
+
+from .gui import mouseevent
 
 def getJoystick(no):
     joystick = pygame.joystick.Joystick(no)
@@ -91,12 +93,14 @@ class Controller(Component):
                 print("EVENT:  " + str(event))
 
                 if event == pygame.QUIT:
-                    self.fireEvent(quit("close"))
+                    self.fireEvent(guiquit("close"))
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_q:
-                        self.fireEvent(quit("key"))
+                        self.fireEvent(guiquit("key"))
                 elif event.type == pygame.VIDEORESIZE:
-                    self.fireEvent(guiresize(event.w, event.h))
+                    self.fireEvent(guiresize(event.w, event.h), "gui")
+                elif event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION):
+                    self.fireEvent(mouseevent(event), "gui")
                 elif event.type in (pygame.JOYAXISMOTION,
                                   pygame.JOYHATMOTION,
                                   pygame.JOYBUTTONDOWN,

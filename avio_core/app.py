@@ -27,39 +27,21 @@ from circuits import Component
 from .controller import Controller, getJoystick
 from .midi import MidiOutput
 from .router import Router
-from .events import guiresize
+from .gui import GUI, Button, ButtonGrid
 
 from pprint import pprint
 
+from .events import guiquit
 
 class App(Component):
     def __init__(self, *args):
         super(App, self).__init__(args)
         print("Initializing core")
 
-        self.screen_width = 640
-        self.screen_height = 480
-
     def started(self, *args):
         print("Starting up core")
 
-        pygame.display.set_caption('AVIO Core')
-        self.mainfont = pygame.font.Font('/home/riot/src/avio/fonts/editundo.ttf', 48)
-        self.caption = self.mainfont.render('AVIO Core', True, (238, 126, 17))
-        self.fireEvent(guiresize(self.screen_width, self.screen_height))
-
-    def guiresize(self, event):
-        self.screen_width, self.screen_height = event.width, event.height
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height), pygame.RESIZABLE)
-        self.screen.fill((31, 31, 31))
-        pygame.draw.rect(self.screen, (31, 31, 31), (0, 0, self.screen_width, self.screen_height))
-
-        self.screen.blit(self.caption, (
-            (self.screen_width / 2) - self.caption.get_width() / 2,
-            (self.screen_height / 2) - self.caption.get_height() / 2))
-        pygame.display.flip()
-
-    def quit(self, *args):
+    def guiquit(self, *args):
         print("Quitting by request: " + str(args))
         sys.exit()
 
@@ -105,5 +87,10 @@ def Launch():
     input = Controller().register(app)
     router = Router().register(app)
     midiout = MidiOutput(deviceid=args.mididev).register(app)
+    gui = GUI().register(app)
+    hellobutton = Button('btnHello', 'Hello World!', (10, 10, 150, 20), True).register(gui)
+    quitbutton = Button('btnQuit', 'Quit', (10, 32, 150, 42), False, False).register(gui)
+    grid = ButtonGrid('beatGrid', 20, 100, 16, 1).register(gui)
+
 
     app.run()

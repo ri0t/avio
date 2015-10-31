@@ -28,9 +28,9 @@ class guiresize(Event):
         self.width = width
 
 
-class quit(Event):
+class guiquit(Event):
     def __init__(self, reason, *args):
-        super(quit, self).__init__(*args)
+        super(guiquit, self).__init__(*args)
         self.reason = reason
 
 # Control events
