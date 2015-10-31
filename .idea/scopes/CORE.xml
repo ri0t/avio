@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="CORE" pattern="file[avio]:avio_core//*||file:avio||file:setup.py" />
+</component>

@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+
+__author__ = 'riot'
+
+from avio_core.app import Launch
+
+if __name__ == "__main__":
+    Launch()
