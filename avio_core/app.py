@@ -77,13 +77,13 @@ def Launch():
 
     args = parser.parse_args()
 
-    if args.io:
-        print_io()
-        sys.exit()
-
     pygame.init()
     pygame.midi.init()
     pygame.joystick.init()
+
+    if args.io:
+        print_io()
+        sys.exit()
 
     app = App()
     input = Controller().register(app)
