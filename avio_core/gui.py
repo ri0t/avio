@@ -91,9 +91,8 @@ class toggle(Event):
         self.target = target
 
 class GUIComponent(Component):
-    def __init__(self, dataname, *args):
+    def __init__(self, dataname=None, *args):
         super(GUIComponent, self).__init__(args)
-        self.dataname = dataname
 
         global names
         while True:
@@ -102,10 +101,13 @@ class GUIComponent(Component):
                 names.append(uniquename)
                 self.uniquename = uniquename
                 break
+        if not dataname:
+            self.dataname = self.uniquename
+        else:
+            self.dataname = dataname
+        #self.channel = self.uniquename
 
-        self.channel = self.uniquename
-
-class Container(Component):
+class Container(GUIComponent):
     def __init__(self, dataname, rect, *args, **kwargs):
         super(Container, self).__init__(dataname, *args, **kwargs)
         print("Initializing Container")
@@ -122,7 +124,7 @@ class Container(Component):
     @handler('mouseevent')
     def mouseevent(self, event):
         coords = event.event.pos[0], event.event.pos[1]
-        print("Mouse event from " + str(self.uniquename) + str(self.channel))
+        print("Mouse event on " + str(self.channel))
 
         hitbox = None
         for rect in self.hitboxes.keys():
@@ -147,31 +149,31 @@ class Container(Component):
             for rect in self.hitboxes.keys():
                 if inhitbox(coords, rect):
                     if not origin in self.hitlist and hitbox['draggable']:
-                        self.fireEvent(toggle(origin), self.channel)
+                        self.fireEvent(toggle(origin))
                         self.hitlist.append(origin)
 
         if event.event.type == pygame.MOUSEBUTTONUP:
             self.dragging = False
             self.hitlist = []
 
-class GUI(Component):
+class GUI(Container):
     channel = "gui"
 
     def __init__(self, *args):
-        super(GUI, self).__init__("gui", args)
-        print("Initializing GUI")
 
         self.screen_width = 640
         self.screen_height = 480
         self.rect = (0, 0, 640, 480)  # TODO: Reevaluate upon resize
+
+        super(GUI, self).__init__(self.rect, args)
+        print("Initializing GUI")
+
         self.screen = None
 
         self.delay = 0.005
 
     def started(self, *args):
         pygame.display.set_caption('AVIO Core')
-        self.mainfont = pygame.font.Font('/home/riot/src/avio/fonts/editundo.ttf', 48)
-        self.caption = self.mainfont.render('AVIO Core', True, (238, 126, 17))
         self.fireEvent(guiresize(self.screen_width, self.screen_height))
 
         Timer(self.delay, Event.create('repaint'), self.channel, persist=True).register(self)
@@ -179,13 +181,8 @@ class GUI(Component):
     def guiresize(self, event):
         self.screen_width, self.screen_height = event.width, event.height
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height), pygame.RESIZABLE)
-        self.screen.fill((31, 31, 31))
-        pygame.draw.rect(self.screen, (31, 31, 31), (0, 0, self.screen_width, self.screen_height))
-
-        self.screen.blit(self.caption, (
-            (self.screen_width / 2) - self.caption.get_width() / 2,
-            (self.screen_height / 2) - self.caption.get_height() / 2))
-        pygame.display.flip()
+        self.screen.fill(background)
+        pygame.draw.rect(self.screen, background, (0, 0, self.screen_width, self.screen_height))
 
         self.fireEvent(draw())
 
@@ -294,7 +291,7 @@ class Button(Component):
             self.fireEvent(buttonevent(self.uniquename, self.state), self.channel)
 
 
-class ButtonGrid(Container):
+class ButtonGrid(GUIComponent):
     def __init__(self, dataname, left, top, width=10, height=10, size=16, *args, **kwargs):
 
         rect = (left, top, left + min(100, width * (size + 1)), top + 15 + height * (size + 1))
