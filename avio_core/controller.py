@@ -64,12 +64,12 @@ class Controller(Component):
     """
     """
 
-    def __init__(self, *args):
+    def __init__(self, delay=0.010, *args):
 
         super(Controller, self).__init__(args)
-        print("Initializing pygame input")
+        print("Initializing controller")
 
-        self.delay = 0.010
+        self.delay = delay
         self.acting = True
 
         self.joystick_count = pygame.joystick.get_count()
@@ -83,7 +83,7 @@ class Controller(Component):
         """
         """
 
-        print("Starting pygame input loop at %i Hz" % int(1 / self.delay))
+        print("Starting controller input loop at %i Hz" % int(1 / self.delay))
         Timer(self.delay, Event.create('peek'), self.channel, persist=True).register(self)
 
     def peek(self, event):

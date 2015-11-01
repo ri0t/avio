@@ -25,13 +25,13 @@ from circuits import Component
 class MidiOutput(Component):
     def __init__(self, deviceid, latency=0, buffer_size=4096, *args):
         super(MidiOutput, self).__init__(*args)
-        print("Initializing midioutput")
+        print("Initializing midi output")
 
         self.output = pygame.midi.Output(deviceid, latency, buffer_size)
         self.deviceid = deviceid
 
     def started(self, *args):
-        print("Starting midioutput on device ", self.deviceid)
+        print("Starting midioutput on device " + str(self.deviceid))
 
     def midicc(self, event):
         print("Midi cc signal received: " + str(event.__dict__))
