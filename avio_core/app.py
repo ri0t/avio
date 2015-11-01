@@ -19,7 +19,6 @@ __author__ = 'riot'
 
 import os
 import sys
-import argparse
 
 import pygame
 
@@ -68,15 +67,7 @@ def print_io():
     pprint(joystickdevices)
 
 
-def Launch():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--io", help="Show io options", action="store_true")
-    parser.add_argument("--gui", help="Activate GUI (EXPERIMENTAL!)", action="store_true")
-    parser.add_argument("--mididev", help="Select MIDI device id", type=int,
-                        default=0)
-
-    args = parser.parse_args()
-
+def Launch(args):
     pygame.init()
     pygame.midi.init()
     pygame.joystick.init()
@@ -98,10 +89,5 @@ def Launch():
         quitbutton = Button('btnQuit', 'Quit', (10, 32, 150, 42), False, False).register(gui)
         grid = ButtonGrid('beatGrid', 20, 100, 16, 1).register(gui)
         grid2 = ButtonGrid('synthGrid', 280, 100, 16, 1).register(gui)
-    else:
-        os.environ['SDL_VIDEODRIVER'] = 'dummy'  # Does not work. :(
 
-        # Warn the user about the necessity of the GUI
-        label = Label('nogui', 'GUI inactive - do not close while operating.', (0, 0, 260, 15)).register(gui)
-        label2 = Label('nogui2', 'Check the README on how to deactivate the GUI completely.', (0, 15, 348, 30)).register(gui)
     app.run()

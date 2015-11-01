@@ -2,7 +2,23 @@
 
 __author__ = 'riot'
 
-from avio_core.app import Launch
+from os import environ
+
+import argparse
 
 if __name__ == "__main__":
-    Launch()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--io", help="Show io options", action="store_true")
+    parser.add_argument("--gui", help="Activate GUI (EXPERIMENTAL!)", action="store_true")
+    parser.add_argument("--mididev", help="Select MIDI device id", type=int,
+                        default=0)
+
+    args = parser.parse_args()
+
+    if not args.gui:
+        environ['SDL_VIDEODRIVER'] = 'dummy'
+        print("Headless mode. To exit, hit CTRL-C.")
+
+    from avio_core.app import Launch
+
+    Launch(args)
