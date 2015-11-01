@@ -17,6 +17,7 @@
 
 __author__ = 'riot'
 
+import os
 import sys
 import argparse
 
@@ -27,7 +28,7 @@ from circuits import Component
 from .controller import Controller, getJoystick
 from .midi import MidiOutput
 from .router import Router
-from .gui import GUI, Button, ButtonGrid
+from .gui import GUI, Button, ButtonGrid, Label
 
 from pprint import pprint
 
@@ -39,7 +40,7 @@ class App(Component):
         print("Initializing core")
 
     def started(self, *args):
-        print("Starting up core")
+        print("Starting core")
 
     def guiquit(self, *args):
         print("Quitting by request: " + str(args))
@@ -63,19 +64,16 @@ def print_io():
 
     print("MIDI Devices:")
     pprint(mididevices)
-    print("Joystick Devices:")
+    print("Joystick-like Devices:")
     pprint(joystickdevices)
 
 
 def Launch():
-    pygame.init()
-    pygame.midi.init()
-    pygame.joystick.init()
-
     parser = argparse.ArgumentParser()
-    parser.add_argument("--io", help="show io options", action="store_true")
+    parser.add_argument("--io", help="Show io options", action="store_true")
+    parser.add_argument("--gui", help="Activate GUI (EXPERIMENTAL!)", action="store_true")
     parser.add_argument("--mididev", help="Select MIDI device id", type=int,
-                        default=pygame.midi.get_default_output_id())
+                        default=0)
 
     args = parser.parse_args()
 
@@ -83,14 +81,27 @@ def Launch():
         print_io()
         sys.exit()
 
+    pygame.init()
+    pygame.midi.init()
+    pygame.joystick.init()
+
     app = App()
     input = Controller().register(app)
     router = Router().register(app)
     midiout = MidiOutput(deviceid=args.mididev).register(app)
+
     gui = GUI().register(app)
-    hellobutton = Button('btnHello', 'Hello World!', (10, 10, 150, 20), True).register(gui)
-    quitbutton = Button('btnQuit', 'Quit', (10, 32, 150, 42), False, False).register(gui)
-    grid = ButtonGrid('beatGrid', 20, 100, 16, 1).register(gui)
 
+    if args.gui:
+        # This is only a test setup.
+        hellobutton = Button('btnHello', 'Hello World!', (10, 10, 150, 20), True).register(gui)
+        quitbutton = Button('btnQuit', 'Quit', (10, 32, 150, 42), False, False).register(gui)
+        grid = ButtonGrid('beatGrid', 20, 100, 16, 1).register(gui)
+        grid2 = ButtonGrid('synthGrid', 280, 100, 16, 1).register(gui)
+    else:
+        os.environ['SDL_VIDEODRIVER'] = 'dummy'  # Does not work. :(
 
+        # Warn the user about the necessity of the GUI
+        label = Label('nogui', 'GUI inactive - do not close while operating.', (0, 0, 260, 15)).register(gui)
+        label2 = Label('nogui2', 'Check the README on how to deactivate the GUI completely.', (0, 15, 348, 30)).register(gui)
     app.run()
