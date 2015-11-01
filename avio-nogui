@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export SDL_VIDEODRIVER=dummy
+
+./avio
