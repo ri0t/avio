@@ -54,19 +54,15 @@ directory) and run it thus:
 
     $ ./avio
 
+Arguments
+=========
 
-Since pygame needs an opened Display, AVIO opens the necessary window.
-It needs to be open during usage, so don't close it. You can send
-commands to the window, e.g. by pressing a key.
-See 'Controlling' below for more information.
+AVIO offers a few command line arguments:
 
-To avoid that (e.g. on headless machines), there is a shell-
-script wrapper that instructs it to use a dummy display instead:
-
- .. code-block:: bash
-
-    $ ./avio-nogui
-
+* -h        Display help text
+* --io      Display IO port tables for MIDI and Controllers
+* --mididev Select a midi device (pick one from the --io command)
+* --gui     Run the (experimental) GUI
 
 Controlling
 ===========
