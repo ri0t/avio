@@ -29,12 +29,22 @@ class MidiOutput(Component):
 
         self.output = pygame.midi.Output(deviceid, latency, buffer_size)
         self.deviceid = deviceid
+        self.lastcc = {}
 
     def started(self, *args):
         print("Starting midioutput on device " + str(self.deviceid))
 
     def midicc(self, event):
-        print("Midi cc signal received: " + str(event.__dict__))
+        print("Midi cc signal received: %i -> %i (%s) " % (event.cc, event.data, event.force))
 
+        if not event.force and event.cc in self.lastcc:
+            if abs(self.lastcc[event.cc] - event.data) > 20:
+                print("Not sending, due to too contrasting change")
+                return
+
+        self.lastcc[event.cc] = event.data
         self.output.write_short(0xb0, event.cc, event.data)
 
+    def resetcclock(self, event):
+        print("Midi cc lock resetting")
+        self.lastcc = {}
