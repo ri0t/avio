@@ -90,7 +90,7 @@ class Controller(Component):
 
         if pygame.event.peek():
             for event in pygame.event.get():
-                print("EVENT:  " + str(event))
+                #print("EVENT:  " + str(event))
 
                 if event == pygame.QUIT:
                     self.fireEvent(guiquit("close"))
