@@ -45,7 +45,13 @@ names = []
 
 
 def shade(a, b):
-    return map(lambda x: x / 2, map(sum, zip(a, b)))
+    if type(b) == float:
+        return map(lambda x: int(x * b), a)
+    elif type(b) == tuple:
+        return map(lambda x: x / 2, map(sum, zip(a, b)))
+    else:
+        print("Bad shading requested! " + str(a) + str(b))
+        return a
 
 def inhitbox(coords, rect):
     if (coords[0] > rect[0] and coords[0] < rect[2] and coords[1] > rect[1] and coords[1] < rect[3]):
@@ -84,6 +90,13 @@ class buttonevent(Event):
         self.origin = origin
         self.state = state
 
+class setvalue(Event):
+    def __init__(self, target, val, *args):
+        super(setvalue, self).__init__(*args)
+        self.target = target
+        self.val = val
+        print("Setting to " + str(self.val))
+
 
 class toggle(Event):
     def __init__(self, target, *args):
@@ -99,13 +112,12 @@ class GUIComponent(Component):
             uniquename = "%s%s" % (self.name, randint(0, 32768))
             if uniquename not in names:
                 names.append(uniquename)
-                self.uniquename = uniquename
                 break
+
         if not dataname:
             self.dataname = self.uniquename
         else:
             self.dataname = dataname
-        #self.channel = self.uniquename
 
 class Container(GUIComponent):
     def __init__(self, dataname, rect, *args, **kwargs):
@@ -212,7 +224,7 @@ class Label(GUIComponent):
         self.height = rect[3] - rect[1]
 
     def started(self, *args):
-        print("Starting up label " + self.uniquename)
+        print("Starting up label " + self.dataname)
 
         self.fireEvent(registerhitbox(self.channel, self.rect), "gui")
 
@@ -233,9 +245,69 @@ class Label(GUIComponent):
 
         self.fireEvent(paintrequest(srf, self.rect[0], self.rect[1]), "gui")
 
+class Meter(GUIComponent):
+
+    def __init__(self, dataname, label, left, top, width=20, height=100, val=0, min=0, max=1, disabled=False, *args, **kwargs):
+        super(Meter, self).__init__(dataname, *args, **kwargs)
+        print("Initializing Meter")
+
+        if label != '':
+            self.label = label
+        else:
+            self.label = None
+        self.top = top
+        self.left = left
+        self.disabled = disabled
+        self.val = val
+        self.min = min
+        self.max = max
+
+        self.width = width
+        self.height = height
+        self.rect = (left, top, left + width, top + height)
+
+    def started(self, *args):
+        print("Starting up label " + self.dataname)
+
+    @handler('draw', channel="gui")
+    def draw(self):
+        print("Meter drawing!")
+        srf = pygame.Surface((self.width, self.height))
+        if self.disabled:
+            bright = shade(hilight, background)
+        else:
+            bright = hilight
+
+        pprint(("Meter data: ", self.val, self.max))
+
+        dark = shade(background, 0.6)
+        pprint(dark)
+        srf.fill(dark)
+
+        rect = (0, self.height - (self.height * (self.val - self.min) / self.max), self.width, self.height)
+        pprint(rect)
+        pygame.draw.rect(srf, bright, rect)
+
+        if self.label:
+            lbl = guifont.render(self.label, True, background)
+
+        if self.label:
+            center = ((self.width / 2) - lbl.get_width() / 2, (self.height / 2) - lbl.get_height() / 2)
+            srf.blit(lbl, center)
+
+        self.fireEvent(paintrequest(srf, self.left, self.top), "gui")
+
+    def setvalue(self, event):
+        print("Meter received value event.")
+
+        if event.target == self.dataname:
+            print(self.dataname + " setting value: " + str(event.val))
+            self.val = event.val
+            self.draw()
 
 
-class Button(Component):
+
+class Button(GUIComponent):
 
     def __init__(self, dataname, label, rect, state=False, disabled=False, draggable=False, *args, **kwargs):
         super(Button, self).__init__(dataname, *args, **kwargs)
@@ -254,7 +326,7 @@ class Button(Component):
         self.height = rect[3] - rect[1]
 
     def started(self, *args):
-        print("Starting up button " + self.uniquename)
+        print("Starting up button " + self.dataname)
 
         self.fireEvent(registerhitbox(self.channel, self.rect, self.draggable), "gui")
 
@@ -284,11 +356,11 @@ class Button(Component):
 
     def toggle(self, event):
 
-        if not self.disabled and event.target == self.uniquename:
-            print(self.uniquename + " toggling.")
+        if not self.disabled and event.target == self.dataname:
+            print(self.dataname + " toggling.")
             self.state = not self.state
             self.draw()
-            self.fireEvent(buttonevent(self.uniquename, self.state), self.channel)
+            self.fireEvent(buttonevent(self.dataname, self.state), self.channel)
 
 
 class ButtonGrid(GUIComponent):
@@ -306,12 +378,12 @@ class ButtonGrid(GUIComponent):
         self.height = height
         self.size = size
 
-        Button('btnInvert', 'Invert', (self.left, self.top, self.left + 100, self.top + 15), state=True).register(self)
+        Button(self.dataname + '-btnInvert', 'Invert', (self.left, self.top, self.left + 100, self.top + 15), state=True).register(self)
 
         for x in range(self.width):
             for y in range(self.height):
                 rect = (self.left + (x * self.size), self.top + 16 + (y * self.size), self.left + (x * self.size) + self.size - 1, self.top + 16 + (y * self.size) + self.size - 1)
-                button = Button('btn' + str(x) + '-' + str(y), '', rect, draggable=True).register(self)
+                button = Button(self.dataname + '-btn' + str(x) + '-' + str(y), '', rect, draggable=True).register(self)
 
     def buttonevent(self, event):
         print("Hello grid event")
@@ -320,4 +392,4 @@ class ButtonGrid(GUIComponent):
             self.inverting = event.state
 
     def started(self, *args):
-        print("Starting up buttongrid " + self.uniquename)
+        print("Starting up buttongrid " + self.dataname)
