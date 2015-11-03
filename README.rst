@@ -54,15 +54,23 @@ directory) and run it thus:
 
     $ ./avio
 
+On the first start - or if there is no configuration at all - AVIO will
+create a configuration in ~/.avio
+
+You should edit the default router configuration to suit your controller
+and needs.
+A detailed explanation on how to write router scenes will follow.
+
 Arguments
 =========
 
 AVIO offers a few command line arguments:
 
-* -h          Display help text
-* --io        Display IO port tables for MIDI and Controllers
-* --mididev   Select a midi device (pick one from the --io command)
-* --gui       Run the (experimental) GUI
+* -h                Display help text
+* --io              Display IO port tables for MIDI and Controllers
+* --mididev         Select a midi device (pick one from the --io command)
+* --gui             Run the (experimental) GUI
+* --program $NAME   Load router program configuration from ~/.avio/router_$NAME.json
 
 Controlling
 ===========
