@@ -22,16 +22,16 @@ import sys
 
 import pygame
 
-from circuits import Component
+from circuits import Component, Timer
 
 from .controller import Controller, getJoystick
 from .midi import MidiOutput
 from .router import Router
-from .gui import GUI, Button, ButtonGrid, Label
+from .gui import GUI, Button, ButtonGrid, Label, Meter, setvalue
 
 from pprint import pprint
 
-from .events import guiquit
+from .events import guiquit, saveprogram
 
 class App(Component):
     def __init__(self, *args):
@@ -40,6 +40,15 @@ class App(Component):
 
     def started(self, *args):
         print("Starting core")
+
+        Timer(0.5, setvalue('testmeter', 76), persist=True).register(self)
+
+        configpath = os.path.abspath(os.path.expanduser("~/.avio"))
+        if not os.path.exists(configpath):
+            print("Creating configuration folder " + configpath)
+            os.mkdir(configpath)
+        if not os.path.exists(os.path.join(configpath, "router_default.json")):
+            self.fireEvent(saveprogram('default'))
 
     def guiquit(self, *args):
         print("Quitting by request: " + str(args))
@@ -78,16 +87,17 @@ def Launch(args):
 
     app = App()
     input = Controller().register(app)
-    router = Router().register(app)
+    router = Router(program=args.program).register(app)
     midiout = MidiOutput(deviceid=args.mididev).register(app)
 
     gui = GUI().register(app)
 
     if args.gui:
         # This is only a test setup.
-        hellobutton = Button('btnHello', 'Hello World!', (10, 10, 150, 20), True).register(gui)
-        quitbutton = Button('btnQuit', 'Quit', (10, 32, 150, 42), False, False).register(gui)
-        grid = ButtonGrid('beatGrid', 20, 100, 16, 1).register(gui)
-        grid2 = ButtonGrid('synthGrid', 280, 100, 16, 1).register(gui)
+        #hellobutton = Button('btnHello', 'Hello World!', (10, 10, 150, 20), True).register(gui)
+        #quitbutton = Button('btnQuit', 'Quit', (10, 32, 150, 42), False, False).register(gui)
+        #grid = ButtonGrid('beatGrid', 25, 100, 2, 2).register(gui)
+        #qqqgrid2 = ButtonGrid('synthGrid', 285, 100, 3, 3).register(gui)
+        meter = Meter('testmeter', 'dB', 5, 100, max=100).register(gui)
 
     app.run()

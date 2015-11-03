@@ -45,10 +45,30 @@ class joystickchange(controlinput):
     def __init__(self, *args):
         super(joystickchange, self).__init__(*args)
 
+# Midi events
+
+class resetcclock(Event):
+    pass
 
 class midicc(Event):
-    def __init__(self, cc, data, *args):
+    def __init__(self, cc, data=None, force=False, *args):
         super(midicc, self).__init__(*args)
 
         self.cc = cc
         self.data = data
+        self.force = force
+
+# Router events
+
+class loadscene(Event):
+    def __init__(self, scene, *args):
+        super(loadscene, self).__init__(*args)
+        self.scene = scene
+
+class loadprogram(Event):
+    def __init__(self, program, *args):
+        super(loadprogram, self).__init__(*args)
+        self.program = program
+
+class saveprogram(loadprogram):
+    pass

@@ -10,8 +10,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--io", help="Show io options", action="store_true")
     parser.add_argument("--gui", help="Activate GUI (EXPERIMENTAL!)", action="store_true")
-    parser.add_argument("--mididev", help="Select MIDI device id", type=int,
-                        default=0)
+    parser.add_argument("--mididev", help="Select MIDI device id", type=int, default=0)
+    parser.add_argument("--program", help="Load routing configuration from JSON configuration file", type=str,
+                        default='default')
 
     args = parser.parse_args()
 
