@@ -21,9 +21,10 @@ import os.path
 
 import pygame
 
-from circuits import Component, Event, Timer, handler
+from circuits import Event, Timer, handler
 
-from .events import guiresize, guiquit
+from avio_core.component import AVIOComponent
+from avio_core.events import guiresize, guiquit
 
 from pprint import pprint
 from random import randint
@@ -103,7 +104,7 @@ class toggle(Event):
         super(toggle, self).__init__(*args)
         self.target = target
 
-class GUIComponent(Component):
+class GUIComponent(AVIOComponent):
     def __init__(self, dataname=None, *args):
         super(GUIComponent, self).__init__(args)
 

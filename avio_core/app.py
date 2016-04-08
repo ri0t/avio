@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from midi import MidiInput
 
 __author__ = 'riot'
 
@@ -22,21 +23,25 @@ import sys
 
 import pygame
 
-from circuits import Component, Timer
+from circuits import Timer
+from avio_core.component import AVIOComponent
 
-from .controller import Controller, getJoystick
-from .midi import MidiOutput
-from .router import Router
-from .gui import GUI, Button, ButtonGrid, Label, Meter, setvalue
+from avio_core.controller import Controller, getJoystick
+from avio_core.midi import MidiOutput, MidiInput
+from avio_core.router import Router
+from avio_core.gui import GUI, Button, ButtonGrid, Label, Meter, setvalue
 
 from pprint import pprint
 
-from .events import guiquit, saveprogram
+from avio_core.events import guiquit, saveprogram
 
-class App(Component):
-    def __init__(self, *args):
+class App(AVIOComponent):
+    def __init__(self, sysargs, *args):
         super(App, self).__init__(args)
         print("Initializing core")
+        self.sysargs = sysargs
+        if sysargs.debug:
+            AVIOComponent.debug = True
 
     def started(self, *args):
         print("Starting core")
@@ -64,7 +69,15 @@ def print_io():
 
     for i in range(midicount):
         mididevice = pygame.midi.get_device_info(i)
-        mididevices[i] = mididevice
+        info = {
+            'type': mididevice[0],
+            'name': mididevice[1],
+        }
+        if mididevice[2] == 1:
+            info['dir'] = 'input'
+        else:
+            info['dir'] = 'output'
+        mididevices[i] = info
 
     for i in range(joystickcount):
         joystickdevice = getJoystick(i)
@@ -85,10 +98,11 @@ def Launch(args):
         print_io()
         sys.exit()
 
-    app = App()
+    app = App(args)
     input = Controller().register(app)
     router = Router(program=args.program).register(app)
-    midiout = MidiOutput(deviceid=args.mididev).register(app)
+    midiout = MidiOutput(deviceid=args.midiout).register(app)
+    midiin = MidiInput(deviceid=args.midiin).register(app)
 
     gui = GUI().register(app)
 

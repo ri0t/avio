@@ -21,9 +21,10 @@ import pygame
 
 from circuits import Component, Timer, Event
 
-from .events import joystickchange, guiquit, guiresize
+from avio_core.component import AVIOComponent
+from avio_core.events import joystickchange, guiquit, guiresize
 
-from .gui import mouseevent
+from avio_core.gui import mouseevent
 
 def getJoystick(no):
     joystick = pygame.joystick.Joystick(no)
@@ -60,7 +61,7 @@ def getJoystick(no):
     return {'name': name, 'axes': axes, 'buttons': buttons, 'hats': hats}
 
 
-class Controller(Component):
+class Controller(AVIOComponent):
     """
     """
 

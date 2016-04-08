@@ -19,6 +19,7 @@ __author__ = 'riot'
 
 from circuits import Event
 
+
 # App/GUI management events
 
 class guiresize(Event):
@@ -33,6 +34,7 @@ class guiquit(Event):
         super(guiquit, self).__init__(*args)
         self.reason = reason
 
+
 # Control events
 
 class controlinput(Event):
@@ -45,10 +47,12 @@ class joystickchange(controlinput):
     def __init__(self, *args):
         super(joystickchange, self).__init__(*args)
 
+
 # Midi events
 
 class resetcclock(Event):
     pass
+
 
 class midicc(Event):
     def __init__(self, cc, data=None, force=False, *args):
@@ -58,6 +62,13 @@ class midicc(Event):
         self.data = data
         self.force = force
 
+class midiinput(Event):
+    def __init__(self, data, *args):
+        super(midiinput, self).__init__(*args)
+        self.data = data
+
+
+
 # Router events
 
 class loadscene(Event):
@@ -65,10 +76,20 @@ class loadscene(Event):
         super(loadscene, self).__init__(*args)
         self.scene = scene
 
+
 class loadprogram(Event):
     def __init__(self, program, *args):
         super(loadprogram, self).__init__(*args)
         self.program = program
 
+
 class saveprogram(loadprogram):
     pass
+
+
+# Camera events
+
+class cameraframe(Event):
+    def __init__(self, frame, *args):
+        super(cameraframe, self).__init__(*args)
+        self.frame = frame

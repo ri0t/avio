@@ -8,9 +8,11 @@ import argparse
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--debug", help="Show debug outout", action="store_true")
     parser.add_argument("--io", help="Show io options", action="store_true")
     parser.add_argument("--gui", help="Activate GUI (EXPERIMENTAL!)", action="store_true")
-    parser.add_argument("--mididev", help="Select MIDI device id", type=int, default=0)
+    parser.add_argument("--midiout", help="Select MIDI output device id", type=int, default=0)
+    parser.add_argument("--midiin", help="Select MIDI input device id", type=int, default=0)
     parser.add_argument("--program", help="Load named router program from ~/.avio/router_*.json", type=str,
                         default='default')
 

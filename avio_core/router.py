@@ -21,9 +21,9 @@ import pygame
 import json
 import os.path
 
-from circuits import Component, Event
+from avio_core.component import AVIOComponent
 
-from .events import midicc, resetcclock, loadscene
+from avio_core.events import midicc, resetcclock, loadscene
 
 from pprint import pprint
 
@@ -33,7 +33,7 @@ routerevents = {'midicc': midicc,
                 }
 
 
-class Router(Component):
+class Router(AVIOComponent):
     def __init__(self, program='default', *args):
         super(Router, self).__init__(*args)
         print("Initializing router")

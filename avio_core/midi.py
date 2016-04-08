@@ -20,9 +20,13 @@ __author__ = 'riot'
 import pygame
 import pygame.midi
 
-from circuits import Component
+from circuits import Event, Timer
 
-class MidiOutput(Component):
+from avio_core.component import AVIOComponent
+from avio_core.events import midiinput
+
+
+class MidiOutput(AVIOComponent):
     def __init__(self, deviceid, latency=0, buffer_size=4096, *args):
         super(MidiOutput, self).__init__(*args)
         print("Initializing midi output")
@@ -32,7 +36,7 @@ class MidiOutput(Component):
         self.lastcc = {}
 
     def started(self, *args):
-        print("Starting midioutput on device " + str(self.deviceid))
+        print("Starting midi output on device " + str(self.deviceid))
 
     def midicc(self, event):
         print("Midi cc signal received: %i -> %i (%s) " % (event.cc, event.data, event.force))
@@ -48,3 +52,37 @@ class MidiOutput(Component):
     def resetcclock(self, event):
         print("Midi cc lock resetting")
         self.lastcc = {}
+
+
+class MidiInput(AVIOComponent):
+    def __init__(self, deviceid, latency=0, delay=0.01, *args):
+        super(MidiInput, self).__init__(*args)
+        print("Initializing midi input")
+
+        self.input = pygame.midi.Input(deviceid, latency)
+        self.deviceid = deviceid
+        self.lastcc = {}
+        self.delay = delay
+
+
+    def started(self, *args):
+        """
+        """
+        print("Starting midi input on device " + str(self.deviceid) + " at %i Hz" % int(1 / self.delay))
+        Timer(self.delay, Event.create('peek'), self.channel, persist=True).register(self)
+
+    def peek(self, event):
+        if self.input.poll():
+            while self.input.poll():
+
+                mididata = self.input.read(1)
+                if len(mididata) > 1:
+                    mididata = mididata[-1]
+                else:
+                    mididata = mididata[0]
+
+                if self.debug:
+                    print(mididata)
+
+                self.fireEvent(midiinput(mididata))
+
