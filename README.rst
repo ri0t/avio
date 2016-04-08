@@ -66,11 +66,11 @@ Arguments
 
 AVIO offers a few command line arguments:
 
-* -h                Display help text
-* --io              Display IO port tables for MIDI and Controllers
-* --mididev         Select a midi device (pick one from the --io command)
-* --gui             Run the (experimental) GUI
-* --program $NAME   Load router program configuration from ~/.avio/router_$NAME.json
+    -h                Display help text
+    --io              Display IO port tables for MIDI and Controllers
+    --mididev id      Select a midi device (pick one from the --io command)
+    --gui             Run the (experimental) GUI
+    --program name    Load router program configuration from ~/.avio/router_$name.json
 
 Controlling
 ===========
