@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="775.95807"
+   height="757.66907"
+   viewBox="0 0 205.30557 200.46661"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.1 r15371"
+   sodipodi:docname="startscreen.svg">
+  <defs
+     id="defs2">
+    <filter
+       inkscape:label="Evanescent"
+       inkscape:menu="Blurs"
+       inkscape:menu-tooltip="Blur the contents of objects, preserving the outline and adding progressive transparency at edges"
+       style="color-interpolation-filters:sRGB"
+       id="filter5187">
+      <feGaussianBlur
+         result="result6"
+         stdDeviation="3"
+         in="SourceGraphic"
+         id="feGaussianBlur5181" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 "
+         result="result7"
+         in="SourceGraphic"
+         id="feColorMatrix5183" />
+      <feComposite
+         operator="in"
+         in="result6"
+         in2="result7"
+         id="feComposite5185" />
+    </filter>
+    <filter
+       inkscape:label="Blur"
+       inkscape:menu="Blurs"
+       inkscape:menu-tooltip="Blur the contents of objects, preserving the outline and adding progressive transparency at edges"
+       style="color-interpolation-filters:sRGB"
+       id="filter5195">
+      <feGaussianBlur
+         result="result6"
+         stdDeviation="3"
+         in="SourceGraphic"
+         id="feGaussianBlur5189" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 "
+         result="result7"
+         in="SourceGraphic"
+         id="feColorMatrix5191" />
+      <feComposite
+         operator="in"
+         in="result6"
+         in2="result7"
+         id="feComposite5193"
+         result="fbSourceGraphic" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix5197" />
+      <feGaussianBlur
+         id="feGaussianBlur5199"
+         stdDeviation="2 2"
+         result="blur"
+         in="fbSourceGraphic" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.5697833"
+     inkscape:cx="374.69221"
+     inkscape:cy="335.71045"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1916"
+     inkscape:window-height="1168"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     units="px"
+     showguides="true"
+     inkscape:guide-bbox="true" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-45.847,-91.76725)">
+    <rect
+       style="opacity:1;fill:#1f1f1f;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.11416197;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4611"
+       width="205.30557"
+       height="200.46661"
+       x="47.434502"
+       y="91.76725" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4493"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.5px;line-height:125%;font-family:'Edit Undo Dot BRK';-inkscape-font-specification:'Edit Undo Dot BRK';letter-spacing:0px;word-spacing:0px;fill:#804409;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       transform="matrix(0.26127838,0,0,0.26127838,-122.95378,84.855477)"><flowRegion
+         id="flowRegion4495"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Edit Undo Dot BRK';-inkscape-font-specification:'Edit Undo Dot BRK';fill:#804409;fill-opacity:1"><rect
+           id="rect4497"
+           width="561.64502"
+           height="184.85793"
+           x="761.65503"
+           y="411.86316"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Edit Undo Dot BRK';-inkscape-font-specification:'Edit Undo Dot BRK';fill:#804409;fill-opacity:1" /></flowRegion><flowPara
+         id="flowPara4499"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:74.66666412px;font-family:'Edit Undo Dot BRK';-inkscape-font-specification:'Edit Undo Dot BRK';text-align:center;text-anchor:middle;fill:#804409;fill-opacity:1"><flowSpan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:74.66666412px;line-height:150%;font-family:'Edit Undo Dot BRK';-inkscape-font-specification:'Edit Undo Dot BRK';text-align:center;text-anchor:middle;fill:#804409;fill-opacity:1"
+           id="flowSpan4507">AUDIOVISUAL </flowSpan></flowPara><flowPara
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:74.66666412px;font-family:'Edit Undo Dot BRK';-inkscape-font-specification:'Edit Undo Dot BRK';text-align:center;text-anchor:middle;fill:#804409;fill-opacity:1"
+         id="flowPara4603">INPUTOUTPUT</flowPara><flowPara
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:74.66666412px;font-family:'Edit Undo Dot BRK';-inkscape-font-specification:'Edit Undo Dot BRK';text-align:center;text-anchor:middle;fill:#804409;fill-opacity:1"
+         id="flowPara4605" /><flowPara
+         id="flowPara4501"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:74.66666412px;font-family:'Edit Undo Dot BRK';-inkscape-font-specification:'Edit Undo Dot BRK';text-align:center;letter-spacing:1.38px;text-anchor:middle;fill:#804409;fill-opacity:1" /></flowRoot>    <flowRoot
+       transform="matrix(0.51718,0,0,0.51718,24.390926,36.088381)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;line-height:125%;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';letter-spacing:0px;word-spacing:0px;fill:#180d02;fill-opacity:0.88563831;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter5195)"
+       id="flowRoot4643"
+       xml:space="preserve"><flowRegion
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';fill:#180d02;fill-opacity:0.88563831"
+         id="flowRegion4639"><rect
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';fill:#180d02;fill-opacity:0.88563831"
+           y="103.76662"
+           x="121.21831"
+           height="557.60419"
+           width="885.90381"
+           id="rect4637" /></flowRegion><flowPara
+         id="flowPara4641">AVIO</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4485"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;line-height:125%;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';letter-spacing:0px;word-spacing:0px;fill:#ee7e11;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter5187)"
+       transform="matrix(0.51718,0,0,0.51718,21.21571,32.648798)"><flowRegion
+         id="flowRegion4487"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';fill:#ee7e11;fill-opacity:1"><rect
+           id="rect4489"
+           width="885.90381"
+           height="557.60419"
+           x="121.21831"
+           y="103.76662"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';fill:#ee7e11;fill-opacity:1" /></flowRegion><flowPara
+         id="flowPara4491">AVIO</flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.37228775px;line-height:125%;font-family:'Edit Undo Dot BRK';-inkscape-font-specification:'Edit Undo Dot BRK';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.23692267px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="87.150269"
+       y="247.96849"
+       id="text4609"><tspan
+         sodipodi:role="line"
+         id="tspan4607"
+         x="87.150269"
+         y="247.96849"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.37228775px;font-family:'Edit Undo Dot BRK';-inkscape-font-specification:'Edit Undo Dot BRK';stroke-width:0.23692267px">advanced vjing suite</tspan></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6685"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18.66666603px;line-height:125%;font-family:'Munro Small';-inkscape-font-specification:'Munro Small';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ee7e11;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       transform="matrix(0.26458333,0,0,0.26458333,-7.0288769,87)"><flowRegion
+         id="flowRegion6687"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18.66666603px;font-family:'Munro Small';-inkscape-font-specification:'Munro Small';text-align:center;text-anchor:middle;fill:#ee7e11;fill-opacity:1"><rect
+           id="rect6689"
+           width="545.04291"
+           height="37.837692"
+           x="316.21497"
+           y="739.64697"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18.66666603px;font-family:'Munro Small';-inkscape-font-specification:'Munro Small';text-align:center;text-anchor:middle;fill:#ee7e11;fill-opacity:1"
+           ry="0" /></flowRegion><flowPara
+         id="flowPara6691">(C) 2016-2017 riot@c-base.org - github.com/ri0t/avio</flowPara></flowRoot>    <rect
+       style="opacity:1;fill:#ee7e11;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.06500006;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4523"
+       width="0.35754362"
+       height="0.41713423"
+       x="186.42123"
+       y="285.73849" />
+  </g>
+</svg>

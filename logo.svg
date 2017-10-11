@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="518.91687"
+   height="254.95395"
+   viewBox="0 0 137.29675 67.456567"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.1 r15371"
+   sodipodi:docname="logo.svg">
+  <defs
+     id="defs2">
+    <filter
+       inkscape:label="Evanescent"
+       inkscape:menu="Blurs"
+       inkscape:menu-tooltip="Blur the contents of objects, preserving the outline and adding progressive transparency at edges"
+       style="color-interpolation-filters:sRGB"
+       id="filter5187">
+      <feGaussianBlur
+         result="result6"
+         stdDeviation="3"
+         in="SourceGraphic"
+         id="feGaussianBlur5181" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 "
+         result="result7"
+         in="SourceGraphic"
+         id="feColorMatrix5183" />
+      <feComposite
+         operator="in"
+         in="result6"
+         in2="result7"
+         id="feComposite5185" />
+    </filter>
+    <filter
+       inkscape:label="Blur"
+       inkscape:menu="Blurs"
+       inkscape:menu-tooltip="Blur the contents of objects, preserving the outline and adding progressive transparency at edges"
+       style="color-interpolation-filters:sRGB"
+       id="filter5195">
+      <feGaussianBlur
+         result="result6"
+         stdDeviation="3"
+         in="SourceGraphic"
+         id="feGaussianBlur5189" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 "
+         result="result7"
+         in="SourceGraphic"
+         id="feColorMatrix5191" />
+      <feComposite
+         operator="in"
+         in="result6"
+         in2="result7"
+         id="feComposite5193"
+         result="fbSourceGraphic" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix5197" />
+      <feGaussianBlur
+         id="feGaussianBlur5199"
+         stdDeviation="2 2"
+         result="blur"
+         in="fbSourceGraphic" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.1100044"
+     inkscape:cx="296.11524"
+     inkscape:cy="-140.97863"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1916"
+     inkscape:window-height="1168"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     units="px"
+     showguides="true"
+     inkscape:guide-bbox="true" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-45.608639,-91.771065)">
+    <flowRoot
+       transform="matrix(0.51718,0,0,0.51718,-10.409987,12.013777)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;line-height:125%;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';letter-spacing:0px;word-spacing:0px;fill:#180d02;fill-opacity:0.88563831;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter5195)"
+       id="flowRoot4643"
+       xml:space="preserve"><flowRegion
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';fill:#180d02;fill-opacity:0.88563831"
+         id="flowRegion4639"><rect
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';fill:#180d02;fill-opacity:0.88563831"
+           y="103.76662"
+           x="121.21831"
+           height="557.60419"
+           width="885.90381"
+           id="rect4637" /></flowRegion><flowPara
+         id="flowPara4641">AVIO</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4485"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;line-height:125%;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';letter-spacing:0px;word-spacing:0px;fill:#ee7e11;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter5187)"
+       transform="matrix(0.51718,0,0,0.51718,-13.585203,8.5741938)"><flowRegion
+         id="flowRegion4487"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';fill:#ee7e11;fill-opacity:1"><rect
+           id="rect4489"
+           width="885.90381"
+           height="557.60419"
+           x="121.21831"
+           y="103.76662"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:'Vigilance BRK';-inkscape-font-specification:'Vigilance BRK';fill:#ee7e11;fill-opacity:1" /></flowRegion><flowPara
+         id="flowPara4491">AVIO</flowPara></flowRoot>  </g>
+</svg>
