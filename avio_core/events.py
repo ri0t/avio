@@ -62,11 +62,11 @@ class midicc(Event):
         self.data = data
         self.force = force
 
+
 class midiinput(Event):
     def __init__(self, data, *args):
         super(midiinput, self).__init__(*args)
         self.data = data
-
 
 
 # Router events
@@ -87,9 +87,9 @@ class saveprogram(loadprogram):
     pass
 
 
-# Camera events
+# Keyboard
 
-class cameraframe(Event):
-    def __init__(self, frame, *args):
-        super(cameraframe, self).__init__(*args)
-        self.frame = frame
+class keypress(Event):
+    def __init__(self, ev, *args):
+        super(keypress, self).__init__(*args)
+        self.ev = ev

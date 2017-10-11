@@ -36,7 +36,7 @@ routerevents = {'midicc': midicc,
 class Router(AVIOComponent):
     def __init__(self, program='default', *args):
         super(Router, self).__init__(*args)
-        print("Initializing router")
+        self.log("Initializing router")
 
         self.scenes = {
             'default': {
@@ -84,13 +84,13 @@ class Router(AVIOComponent):
         try:
             self.routes = self.scenes['default']
         except KeyError:
-            print("Router has no valid default program!")
+            self.log("Router has no valid default program!")
 
         self.shiftcc = {}
         self.muted = False
 
     def started(self, *args):
-        print("Starting router")
+        self.log("Starting router")
 
     def getshift(self):
         shift = 0
@@ -101,25 +101,25 @@ class Router(AVIOComponent):
 
     def _saveprogram(self, programname):
         realname = os.path.abspath(os.path.expanduser("~/.avio/router_" + programname + ".json"))
-        print("Router storing program " + programname + " to " + realname)
+        self.log("Router storing program " + programname + " to " + realname)
         try:
             with open(realname, "w") as fp:
                 json.dump(self.scenes, fp, indent=4)
         #except IOError as e:
 
         except Exception as e:
-            print("Program save failed for %s: %s (%s)" % (programname, e, type(e)))
+            self.log("Program save failed for %s: %s (%s)" % (programname, e, type(e)))
 
     def _loadprogram(self, programname):
         backup = (self.scenes, self.routes)
         realname = os.path.abspath(os.path.expanduser("~/.avio/router_" + programname + ".json"))
-        print("Router loading program " + programname + " from " + realname)
+        self.log("Router loading program " + programname + " from " + realname)
         try:
             with open(realname, 'r') as fp:
                 self.scenes = json.load(fp)
             self.routes = self.scenes['default']
         except Exception as e:
-            print("Program load failed for %s: %s (%s)" % (programname, e, type(e)))
+            self.log("Program load failed for %s: %s (%s)" % (programname, e, type(e)))
             self.scenes, self.routes = backup
 
     def saveprogram(self, event):
@@ -129,11 +129,11 @@ class Router(AVIOComponent):
         self._loadprogram(event.program)
 
     def loadscene(self, event):
-        print("Loading new scene: " + str(event.scene))
+        self.log("Loading new scene: " + str(event.scene))
         self.routes = self.scenes[event.scene]
 
     def joystickchange(self, event):
-        # print("Router change received: " + str(event.input))
+        # self.log("Router change received: " + str(event.input))
 
         key = None
         identity = None
@@ -142,26 +142,26 @@ class Router(AVIOComponent):
             key = 'axis'
             identity = event.input.axis
         elif event.input.type in (pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
-            # print("Button action")
+            # self.log("Button action")
             key = 'buttons'
             identity = event.input.button
 
-        # print(key, identity)
+        # self.log(key, identity)
         if key != None and identity != None:
             cat = self.routes[key]
             if not str(identity) in cat:
-                print("No routing rule for %s - %s" % (key, identity))
+                self.log("No routing rule for %s - %s" % (key, identity))
                 return
             route = cat[str(identity)]
 
             evtype = event.input.type
 
             if 'mute' in route:
-                print("Muted control")
+                self.log("Muted control")
                 self.muted = evtype == pygame.JOYBUTTONDOWN
 
             if 'shiftcc' in route:
-                print("Shifting CC")
+                self.log("Shifting CC")
                 if evtype == pygame.JOYBUTTONDOWN:
                     self.shiftcc[identity] = route['shiftcc']
                 else:
@@ -172,7 +172,7 @@ class Router(AVIOComponent):
                 if 'mode' in route:
                     if (route['mode'] == 'down' and evtype == pygame.JOYBUTTONUP) or (
                             route['mode'] == 'up' and evtype == pygame.JOYBUTTONDOWN):
-                        print("Wrong mode for route: " + str(route))
+                        self.log("Wrong mode for route: " + str(route))
                         return
                 if type(signal) == midicc:
                     if len(self.shiftcc) > 0:

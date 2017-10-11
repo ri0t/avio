@@ -22,7 +22,7 @@ import pygame
 from circuits import Component, Timer, Event
 
 from avio_core.component import AVIOComponent
-from avio_core.events import joystickchange, guiquit, guiresize
+from avio_core.events import joystickchange, guiquit, guiresize, keypress
 
 from avio_core.gui import mouseevent
 
@@ -68,7 +68,7 @@ class Controller(AVIOComponent):
     def __init__(self, delay=0.010, *args):
 
         super(Controller, self).__init__(args)
-        print("Initializing controller")
+        self.log("Initializing controller")
 
         self.delay = delay
         self.acting = True
@@ -84,20 +84,22 @@ class Controller(AVIOComponent):
         """
         """
 
-        print("Starting controller input loop at %i Hz" % int(1 / self.delay))
+        self.log("Starting controller input loop at %i Hz" % int(1 / self.delay))
         Timer(self.delay, Event.create('peek'), self.channel, persist=True).register(self)
 
     def peek(self, event):
 
         if pygame.event.peek():
             for event in pygame.event.get():
-                #print("EVENT:  " + str(event))
+                #self.log("EVENT:  " + str(event))
 
                 if event == pygame.QUIT:
                     self.fireEvent(guiquit("close"))
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_q:
                         self.fireEvent(guiquit("key"))
+                    else:
+                        self.fireEvent(keypress(event))
                 elif event.type == pygame.VIDEORESIZE:
                     self.fireEvent(guiresize(event.w, event.h), "gui")
                 elif event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION):

@@ -29,35 +29,35 @@ from avio_core.events import midiinput
 class MidiOutput(AVIOComponent):
     def __init__(self, deviceid, latency=0, buffer_size=4096, *args):
         super(MidiOutput, self).__init__(*args)
-        print("Initializing midi output")
+        self.log("Initializing midi output")
 
         self.output = pygame.midi.Output(deviceid, latency, buffer_size)
         self.deviceid = deviceid
         self.lastcc = {}
 
     def started(self, *args):
-        print("Starting midi output on device " + str(self.deviceid))
+        self.log("Starting midi output on device " + str(self.deviceid))
 
     def midicc(self, event):
-        print("Midi cc signal received: %i -> %i (%s) " % (event.cc, event.data, event.force))
+        self.log("Midi cc signal received: %i -> %i (%s) " % (event.cc, event.data, event.force))
 
         if not event.force and event.cc in self.lastcc:
             if abs(self.lastcc[event.cc] - event.data) > 20:
-                print("Not sending, due to too contrasting change")
+                self.log("Not sending, due to too contrasting change")
                 return
 
         self.lastcc[event.cc] = event.data
         self.output.write_short(0xb0, event.cc, event.data)
 
     def resetcclock(self, event):
-        print("Midi cc lock resetting")
+        self.log("Midi cc lock resetting")
         self.lastcc = {}
 
 
 class MidiInput(AVIOComponent):
     def __init__(self, deviceid, latency=0, delay=0.01, *args):
         super(MidiInput, self).__init__(*args)
-        print("Initializing midi input")
+        self.log("Initializing midi input")
 
         self.input = pygame.midi.Input(deviceid, latency)
         self.deviceid = deviceid
@@ -68,7 +68,7 @@ class MidiInput(AVIOComponent):
     def started(self, *args):
         """
         """
-        print("Starting midi input on device " + str(self.deviceid) + " at %i Hz" % int(1 / self.delay))
+        self.log("Starting midi input on device " + str(self.deviceid) + " at %i Hz" % int(1 / self.delay))
         Timer(self.delay, Event.create('peek'), self.channel, persist=True).register(self)
 
     def peek(self, event):
@@ -82,7 +82,7 @@ class MidiInput(AVIOComponent):
                     mididata = mididata[0]
 
                 if self.debug:
-                    print(mididata)
+                    self.log(mididata)
 
                 self.fireEvent(midiinput(mididata))
 

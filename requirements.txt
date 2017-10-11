@@ -1,9 +1,9 @@
 # Basics
 -e git+https://github.com/circuits/circuits.git#egg=circuits
-pygame==1.9.1release
+#pygame==1.9.1release
 
 # Video & CV
-cv2 >= 2.4.9
+#cv2 >= 2.4.9
 
 # Compat
 six
