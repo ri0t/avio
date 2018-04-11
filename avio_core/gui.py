@@ -18,6 +18,7 @@
 __author__ = 'riot'
 
 import os.path
+import time
 
 import pygame
 
@@ -31,6 +32,7 @@ from random import randint
 
 hilight = (238, 126, 17, 128)
 background = (31, 31, 31, 128)
+dark = hilight
 white = (255, 255, 255)
 black = (0, 0, 0)
 
@@ -145,6 +147,9 @@ class GUIComponent(AVIOComponent):
         self.x += event.x
         self.y += event.y
 
+    def repaint(self, event):
+        self.draw()
+
 
 class Container(GUIComponent):
     def __init__(self, dataname, rect, *args, **kwargs):
@@ -157,14 +162,14 @@ class Container(GUIComponent):
         self.hitlist = []
 
     def registerhitbox(self, event):
-        self.log("Hitbox registered.")
+        self.log("Hitbox registered:", event.origin, event.rect)
         self.hitboxes[event.rect] = {'origin': event.origin,
                                      'draggable': event.draggable}
 
     @handler('mouseevent')
     def mouseevent(self, event):
         coords = event.event.pos[0], event.event.pos[1]
-        self.log("Mouse event on " + str(self.channel))
+        #self.log("Mouse event on " + str(self.channel))
 
         hitbox = None
         for rect in self.hitboxes.keys():
@@ -187,7 +192,7 @@ class Container(GUIComponent):
                 self.hitlist.append(origin)
         if event.event.type == pygame.MOUSEMOTION and event.event.buttons[
             0] == 1:
-            self.log("Click dragging!")
+            #self.log("Click dragging!")
             for rect in self.hitboxes.keys():
                 if inhitbox(coords, rect):
                     if not origin in self.hitlist and hitbox['draggable']:
@@ -202,9 +207,9 @@ class Container(GUIComponent):
 class GUI(Container):
     channel = "gui"
 
-    def __init__(self, *args):
-        self.screen_width = 1920
-        self.screen_height = 1200
+    def __init__(self, *args, **kwargs):
+        screensize = kwargs.get('screensize', (1920, 1200))
+        self.screen_width, self.screen_height  = screensize
         self.rect = (0, 0, self.screen_width, self.screen_height)  # TODO: Reevaluate
         # upon resize
 
@@ -248,6 +253,17 @@ class GUI(Container):
         if event.origin == "btnQuit":
             self.fireEvent(guiquit('btnQuit'))
 
+    def keypress(self, event):
+
+        k = event.ev.key
+        if k == pygame.K_F11:
+            self.log('Taking screenshot')
+            filename = time.strftime("%Y-%m-%d_%H%M%S.jpg")
+            filename = os.path.join(".", filename)
+
+            pygame.image.save(GUIComponent.screen, filename)
+
+
 class Label(GUIComponent):
     def __init__(self, dataname, label, rect, disabled=False, *args, **kwargs):
         super(Label, self).__init__(dataname, *args, **kwargs)
@@ -263,12 +279,12 @@ class Label(GUIComponent):
     def started(self, *args):
         self.log("Starting up label " + self.dataname)
 
-        self.fireEvent(registerhitbox(self.channel, self.rect), "gui")
+        self.fireEvent(registerhitbox(self.dataname, self.rect), "gui")
 
     @handler('draw', channel="gui")
     def draw(self):
-        super(Label, self).draw()
-        self.log("Label drawing")
+        #super(Label, self).draw()
+        #self.log("Label drawing")
         srf = pygame.Surface((self.width, self.height))
         if self.disabled:
             bright = shade(hilight, background)
@@ -311,24 +327,24 @@ class Meter(GUIComponent):
 
     @handler('draw', channel="gui")
     def draw(self):
-        super(Label, self).draw()
-        self.log("Meter drawing!")
+        #super(Meter, self).draw()
+        #self.log("Meter drawing!")
         srf = pygame.Surface((self.width, self.height))
         if self.disabled:
             bright = shade(hilight, background)
         else:
             bright = hilight
 
-        pprint(("Meter data: ", self.val, self.max))
+        #pprint(("Meter data: ", self.val, self.max))
 
-        dark = shade(background, 0.6)
-        pprint(dark)
+        #dark = shade(background, 0.6)
+        #pprint(dark)
         srf.fill(dark)
 
         rect = (
         0, self.height - (self.height * (self.val - self.min) / self.max),
         self.width, self.height)
-        pprint(rect)
+        #pprint(rect)
         pygame.draw.rect(srf, bright, rect)
 
         if self.label:
@@ -342,8 +358,9 @@ class Meter(GUIComponent):
         self.fireEvent(paintrequest(srf, self.left, self.top), "gui")
 
     def toggle(self, event):
-        self.log("HELLO:")
-        pprint(event)
+        pass
+        #self.log("HELLO:")
+        #pprint(event)
 
     def setvalue(self, event):
         self.log("Meter received value event.")
@@ -375,13 +392,13 @@ class Button(GUIComponent):
     def started(self, *args):
         self.log("Starting up button " + self.dataname)
 
-        self.fireEvent(registerhitbox(self.channel, self.rect, self.draggable),
+        self.fireEvent(registerhitbox(self.dataname, self.rect, self.draggable),
                        "gui")
 
     @handler('draw', channel="gui")
     def draw(self):
-        super(Label, self).draw()
-        self.log("Button drawing!")
+        #super(Button, self).draw()
+        #self.log("Button drawing!")
         srf = pygame.Surface((self.width, self.height))
         if self.disabled:
             bright = shade(hilight, background)
@@ -405,7 +422,7 @@ class Button(GUIComponent):
         self.fireEvent(paintrequest(srf, self.rect[0], self.rect[1]), "gui")
 
     def toggle(self, event):
-        pprint(event.__dict__)
+        #self.log("Button hit:", event.__dict__, pretty=True)
 
         if not self.disabled and event.target == self.dataname:
             self.log(self.dataname + " toggling.")
@@ -444,6 +461,9 @@ class ButtonGrid(GUIComponent):
                 self.top + 16 + (y * self.size) + self.size - 1)
                 button = Button(self.dataname + '-btn' + str(x) + '-' + str(y),
                                 '', rect, draggable=True).register(self)
+
+    def draw(self):
+        pass
 
     def buttonevent(self, event):
         self.log("Hello grid event")
