@@ -15,10 +15,16 @@ if __name__ == "__main__":
                         action="store_true")
     parser.add_argument("--cam", help="Activate Camera",
                         action="store_true")
+    parser.add_argument("--nosplash", help="Disable splash screen",
+                        action="store_true")
     parser.add_argument("--midiout", help="Select MIDI output device id",
                         type=int, default=None)
     parser.add_argument("--midiin", help="Select MIDI input device id",
                         type=int, default=None)
+    parser.add_argument("--width", help="Output renderer width",
+                        type=int, default=1920)
+    parser.add_argument("--height", help="Output renderer height",
+                        type=int, default=1200)
     parser.add_argument("--program",
                         help="Load named router program from "
                              "~/.avio/router_*.json",

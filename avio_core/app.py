@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import subprocess
 
 __author__ = 'riot'
 
@@ -25,7 +25,6 @@ import pygame
 
 from circuits import Timer
 from avio_core.component import AVIOComponent
-
 
 from avio_core.controller import Controller, getJoystick
 
@@ -96,6 +95,13 @@ def get_io():
 
 
 def Launch(args):
+    if not args.nosplash:
+        # TODO: Get correct script path
+        try:
+            splash = subprocess.Popen(['python', './avio_core/splash.py'])
+        except:
+            pass
+
     pygame.init()
     pygame.midi.init()
     pygame.joystick.init()
@@ -129,6 +135,9 @@ def Launch(args):
         print('Using default midi output: %i' % default_midiout)
         args.midiout = default_midiout
 
+    fullscreen = args.width, args.height
+    args.screensize = fullscreen
+
     app = App(args)
 
     if args.debug:
@@ -146,10 +155,10 @@ def Launch(args):
     midiout = MidiOutput(deviceid=args.midiout).register(app)
     midiin = MidiInput(deviceid=args.midiin).register(app)
     if args.cam:
-        camera = CVCamera(targetresolution=(1920, 1200)).register(app)
+        camera = CVCamera(targetresolution=fullscreen).register(app)
         camdisp = CameraDisplay().register(app)
 
-    gui = GUI().register(app)
+    gui = GUI(fullscreen=fullscreen).register(app)
 
     if args.gui:
         # This is only a test setup.
@@ -164,6 +173,6 @@ def Launch(args):
         #gif2 = GIFImage('testgif2', 'test2.gif').register(gui)
         #gif3 = GIFImage('testgif3', 'test3.gif').register(gui)
         #gif4 = GIFImage('testgif4', 'test4.gif').register(gui)
-        #gif5 = GIFImage('testgif5', 'test5.gif').register(gui)
+        # gif5 = GIFImage('testgif5', 'test5.gif').register(gui)
 
     app.run()
