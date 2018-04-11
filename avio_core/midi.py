@@ -39,12 +39,16 @@ class MidiOutput(AVIOComponent):
         self.log("Starting midi output on device " + str(self.deviceid))
 
     def midicc(self, event):
-        self.log("Midi cc signal received: %i -> %i (%s) " % (event.cc, event.data, event.force))
 
-        if not event.force and event.cc in self.lastcc:
-            if abs(self.lastcc[event.cc] - event.data) > 20:
-                self.log("Not sending, due to too contrasting change")
-                return
+        #if not event.force and event.cc in self.lastcc:
+        #    if abs(self.lastcc[event.cc] - event.data) > 20:
+        #        #self.log("Not sending, due to too contrasting change")
+        #        return
+
+        if event.cc in self.lastcc and self.lastcc[event.cc] == event.data:
+            return
+
+        self.log("Midi cc signal received: %i -> %i (%s) " % (event.cc, event.data, event.force))
 
         self.lastcc[event.cc] = event.data
         self.output.write_short(0xb0, event.cc, event.data)
