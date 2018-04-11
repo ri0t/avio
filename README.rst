@@ -93,11 +93,24 @@ They are currently statically mapped. Only axes work.
 You can adjust the mapping in the router source code. This will be
 enhanced, it is (as almost everything here) WiP.
 
+MIDI
+----
+
+To actually use MIDI data e.g. in Bitwig Studio, you may need to
+load the alsa midi loopback module:
+
+ .. code-block:: bash
+    $ sudo modprobe snd_virmidi
+
+This should enable four virtual loopback devices. With a tool like
+patchage, you can now route AVIO's output midi channel to a loopback
+device, which you can select as MIDI input in BWS.
+
 
 License
 =======
 
-Copyright (C) 2015 riot <riot@c-base.org>
+Copyright (C) 2015-2018 riot <riot@c-base.org>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
