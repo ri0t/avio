@@ -25,6 +25,8 @@ from avio_core.component import AVIOComponent
 
 from avio_core.events import midicc, resetcclock, loadscene
 
+from circuits import Timer, Event
+
 from pprint import pprint
 
 routerevents = {'midicc': midicc,
@@ -44,7 +46,15 @@ class Router(AVIOComponent):
                     '0': {'event': 'midicc', 'args': 20},
                     '1': {'event': 'midicc', 'args': 21},
                     '2': {'event': 'midicc', 'args': 22},
-                    '3': {'event': 'midicc', 'args': 23}
+                    '3': {'event': 'midicc', 'args': 23},
+                    '12': {'event': 'midicc', 'args': 24},
+                    '13': {'event': 'midicc', 'args': 25},
+                    '14': {'event': 'midicc', 'args': 26},
+                    '15': {'event': 'midicc', 'args': 27},
+                    '23': {'event': 'midicc', 'args': 28},
+                    '24': {'event': 'midicc', 'args': 29},
+                    '25': {'event': 'midicc', 'args': 30},
+                    '17': {'event': 'midicc', 'args': 31},
                 },
                 'buttons': {
                     '0': {'shiftcc': 4},
@@ -78,6 +88,8 @@ class Router(AVIOComponent):
         }
         self.routes = self.scenes['default']
 
+        self._saveprogram('default')
+
         if program:
             self._loadprogram(program)
 
@@ -87,7 +99,10 @@ class Router(AVIOComponent):
             self.log("Router has no valid default program!")
 
         self.shiftcc = {}
+        self.warned = []
         self.muted = False
+
+        self.warningtimer = Timer(5, Event.create('reset_warnings'), persistent=True).register(self)
 
     def started(self, *args):
         self.log("Starting router")
@@ -98,6 +113,9 @@ class Router(AVIOComponent):
             shift += item
 
         return shift
+
+    def reset_warnings(self):
+        self.warned = []
 
     def _saveprogram(self, programname):
         realname = os.path.abspath(os.path.expanduser("~/.avio/router_" + programname + ".json"))
@@ -148,9 +166,16 @@ class Router(AVIOComponent):
 
         # self.log(key, identity)
         if key != None and identity != None:
-            cat = self.routes[key]
-            if not str(identity) in cat:
-                self.log("No routing rule for %s - %s" % (key, identity))
+            cat = self.routes.get(key, None)
+            str_id = str(identity)
+
+            if not cat:
+                self.log('Unknown category!', key, str_id)
+
+            if not str_id in cat:
+                if str_id not in self.warned:
+                    self.log("No routing rule for %s - %s" % (key, str_id))
+                    self.warned.append(str_id)
                 return
             route = cat[str(identity)]
 
