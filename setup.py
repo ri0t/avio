@@ -36,6 +36,6 @@ setup(name="AVIO",
       dependency_links=[
       ],
       install_requires=['circuits==3.1.0',
-                        'pygame==1.9.1release'
+                        'pygame>=1.9.1release'
                         ],
       )
