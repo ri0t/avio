@@ -3,31 +3,47 @@
 import time
 import pygame
 import os
+import screeninfo
+
+splash_width = 555
+splash_height = 542
+duration = 10.0
 
 
 def splash_screen():
-    os.environ['SDL_VIDEO_CENTERED'] = '1'
+    m = screeninfo.get_monitors()
+
+    if len(m) > 1:
+        # Find first screen and center splash there
+        for screen in m:
+            if screen.x == 0:
+                x = (screen.width / 2) - (splash_width / 2.0)
+                y = (screen.height / 2) - (splash_height / 2.0)
+                os.environ['SDL_VIDEO_WINDOW_POS'] = str((x, y))
+    else:
+        os.environ['SDL_VIDEO_CENTERED'] = '1'
+
     pygame.init()
 
     pygame.display.set_caption('AVIO Splashscreen')
 
-    screen = pygame.display.set_mode((555, 542), pygame.NOFRAME)
+    screen = pygame.display.set_mode((splash_width, splash_height), pygame.NOFRAME)
     # TODO: Get correct image path
     background_image = pygame.image.load('images/startscreen.png')
     screen.blit(background_image, (0, 0))
 
     start = time.time()
-    now = 0
+    waited = 0
     clicked = False
 
-    while now < 10.0 and not clicked:
+    while waited < duration and not clicked:
         pygame.display.update()
 
         if pygame.event.peek():
             for event in pygame.event.get():
                 if event.type in (pygame.KEYUP, pygame.MOUSEBUTTONDOWN):
                     clicked = True
-        now = time.time() - start
+        waited = time.time() - start
 
 
 if __name__ == '__main__':
