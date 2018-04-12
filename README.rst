@@ -9,9 +9,24 @@ Midi, Audio and Visual data.
 Installation
 ============
 
-You should have python-pygame (1.9.1) installed from your Distribution.
+Dependencies
+------------
+
+You should have these packages installed:
+
+ * python3.5
+ * python3-pip
+ * virtualenv
+ * python3-pygame
+ * python3-numpy
+ * python3-opencv
+
+AVIO
+----
+
 The package will additionally require and install circuits, an event driven
-component framework with minimal overhead.
+component framework with minimal overhead and a few other libraries that don't
+need distribution packages.
 
 Then run:
 
@@ -23,17 +38,17 @@ If you prefer working safe and sane, use a virtualenvironment:
 
  .. code-block:: bash
 
-    $ virtualenv avio --system-site-packages
+    $ virtualenv -p /usr/bin/python3 --system-site-packages avio
     $ source avio/bin/activate
 
 Or if you have (you should ;) virtualenvwrapper:
 
  .. code-block:: bash
 
-    $ mkvirtenv avio --system-site-packages
+    $ mkvirtenv -p /usr/bin/python3 --system-site-packages avio
     $ workon avio
 
-Saves that much typing. Then install AVIO:
+Saves that much typing. I heard, pip-env would be cool. Then install AVIO:
 
  .. code-block:: bash
 
@@ -71,6 +86,7 @@ AVIO offers a few command line arguments:
     --mididev id      Select a midi device (pick one from the --io command)
     --gui             Run the (experimental) GUI
     --program name    Load router program configuration from ~/.avio/router_$name.json
+    --nosplash        Omit the splashscreen
 
 Controlling
 ===========
@@ -80,7 +96,8 @@ Keyboard
 
 The GUI window currently accepts these keystrokes:
 
-* q     Close the application (without asking)
+ * q     Close the application (without asking)
+ * F11   Take a screenshot
 
 More to come.
 
