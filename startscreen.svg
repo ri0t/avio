@@ -15,7 +15,10 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.1 r15371"
-   sodipodi:docname="startscreen.svg">
+   sodipodi:docname="startscreen.svg"
+   inkscape:export-filename="/home/riot/src/avio/images/startscreen.png"
+   inkscape:export-xdpi="68.663506"
+   inkscape:export-ydpi="68.663506">
   <defs
      id="defs2">
     <filter
@@ -81,7 +84,7 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.5697833"
+     inkscape:zoom="0.78489165"
      inkscape:cx="374.69221"
      inkscape:cy="335.71045"
      inkscape:document-units="mm"
@@ -121,7 +124,7 @@
        id="rect4611"
        width="205.30557"
        height="200.46661"
-       x="47.434502"
+       x="45.847"
        y="91.76725" />
     <flowRoot
        xml:space="preserve"
