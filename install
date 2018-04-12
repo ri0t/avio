@@ -1,0 +1,63 @@
+#!/bin/bash
+
+set -e
+
+DEBIAN_PKGS="python3.5 python3-pip virtualenv python3-pygame \
+python3-numpy python3-opencv"
+
+if [ ${1^^} == "-Y" ]
+then
+  AUTO=1
+else
+  AUTO=0
+fi
+
+
+# Check if root
+if [ "$EUID" -ne 0 ]
+then
+    echo "You need root privileges to install AVIO. Use su or sudo."
+    exit
+fi
+
+echo "If you run into any trouble, please read the documentation at"
+echo -e "\nhttps://avio.readthedocs.io/en/latest/start/index.html\n"
+
+# Find our package manager
+if VERB="$( which apt-get )" 2> /dev/null; then
+    echo "Proceeding with autodetected Debian based installation. Please be patient."
+
+    if [ -n $AUTO ]
+    then
+        echo -e "\nAbout to install Debian packages: $DEBIAN_PKGS"
+        echo -n "Ok? [Y/N] "
+        read confirmation
+
+        if [ ! ${confirmation^^} == 'Y' ]
+        then
+            exit
+        fi
+        echo "Installing"
+    fi
+
+    apt-get install -y $DEBIAN_PKGS &>> output.log
+
+    virtualenv -p /usr/bin/python3.5 --system-site-packages venv &>> output.log
+    source venv/bin/activate &>> output.log
+    pip install -Ur requirements.txt &>> output.log
+    python setup.py develop &>> output.log
+
+    echo "All Done!"
+
+elif VERB="$( which yum )" 2> /dev/null; then
+    echo "Modern Red Hat-based - NOT SUPPORTED YET"
+elif VERB="$( which portage )" 2> /dev/null; then
+    echo "Gentoo-based - NOT SUPPORTED YET"
+elif VERB="$( which pacman )" 2> /dev/null; then
+    echo "Arch-based - NOT SUPPORTED YET"
+else
+    echo "Your distribution is not yet supported." >&2
+    exit 1
+fi
+
+
