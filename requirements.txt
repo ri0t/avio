@@ -1,6 +1,7 @@
 # Basics
 -e git+https://github.com/circuits/circuits.git#egg=circuits
 #pygame==1.9.1release
+screeninfo==0.3
 
 # Video & CV
 #cv2 >= 2.4.9
