@@ -54,8 +54,6 @@ class Sequencer(AVIOComponent):
 
         self.steps = np.zeros(self.size, np.uint8)
 
-        self._clear()
-
     def started(self, *args):
         self.log("Starting Sequencer. Output to:", self.channel)
 
@@ -76,6 +74,7 @@ class Sequencer(AVIOComponent):
     def keypress(self, event):
 
         step = self.steps[self.row][self.column][self.mode]
+        mod = event.ev.mod
 
         if event.ev.key == pygame.K_RIGHT:
             self.column += 1
@@ -90,10 +89,12 @@ class Sequencer(AVIOComponent):
             self.mode = self.mode % 2
         elif event.ev.key == pygame.K_SPACE:
             self.steps[self.row][self.column][self.mode] = 255 if step == 0 else 0
-        elif event.ev.key == pygame.K_PLUS and step < 250:
-            self.steps[self.row][self.column][self.mode] += 5
-        elif event.ev.key == pygame.K_MINUS and step > 5:
-            self.steps[self.row][self.column][self.mode] -= 5
+        elif event.ev.key == pygame.K_PLUS:
+            value = step + 5 * ((1 + mod) * 5)
+            self.steps[self.row][self.column][self.mode] = min(value, 255)
+        elif event.ev.key == pygame.K_MINUS:
+            value = step - 5 * ((1 + mod) * 5)
+            self.steps[self.row][self.column][self.mode] = max(value, 0)
         elif event.ev.key == pygame.K_PRINT:
             for i in range(self.size[1]):
                 line = ""
