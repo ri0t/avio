@@ -14,10 +14,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import subprocess
 
 __author__ = 'riot'
 
+import subprocess
 import os
 import sys
 
@@ -32,6 +32,8 @@ from avio_core.camera import CVCamera, CameraDisplay
 from avio_core.gif import GIFImage
 from avio_core.midi import MidiOutput, MidiInput
 from avio_core.router import Router
+from avio_core.matelight import Matelight
+from avio_core.sequencer import Sequencer
 from avio_core.gui import GUI, Button, ButtonGrid, Label, Meter, setvalue
 
 from pprint import pprint
@@ -98,7 +100,7 @@ def Launch(args):
     if not args.nosplash:
         # TODO: Get correct script path
         try:
-            splash = subprocess.Popen(['python', './avio_core/splash.py'])
+            splash = subprocess.Popen([sys.executable, './avio_core/splash.py'])
         except:
             pass
 
@@ -154,6 +156,8 @@ def Launch(args):
     router = Router(program=args.program).register(app)
     midiout = MidiOutput(deviceid=args.midiout).register(app)
     midiin = MidiInput(deviceid=args.midiin).register(app)
+    matelight = Matelight(host=args.host, port=args.port).register(app)
+    sequencer = Sequencer().register(app)
     if args.cam:
         camera = CVCamera(targetresolution=fullscreen).register(app)
         camdisp = CameraDisplay().register(app)
@@ -161,6 +165,7 @@ def Launch(args):
     gui = GUI(fullscreen=fullscreen).register(app)
 
     if args.gui:
+        pass
         # This is only a test setup.
         #hellobutton = Button('btnHello', 'Hello World!', (10, 10, 150, 20),
         #                     True).register(gui)
@@ -169,7 +174,7 @@ def Launch(args):
         #grid = ButtonGrid('beatGrid', 25, 100, 2, 2).register(gui)
         # qqqgrid2 = ButtonGrid('synthGrid', 285, 100, 3, 3).register(gui)
         #meter = Meter('testmeter', 'dB', 5, 100, max=100).register(gui)
-        gif = GIFImage('testgif1', 'test.gif').register(gui)
+        #gif = GIFImage('testgif1', 'test.gif').register(gui)
         #gif2 = GIFImage('testgif2', 'test2.gif').register(gui)
         #gif3 = GIFImage('testgif3', 'test3.gif').register(gui)
         #gif4 = GIFImage('testgif4', 'test4.gif').register(gui)

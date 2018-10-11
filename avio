@@ -25,6 +25,10 @@ if __name__ == "__main__":
                         type=int, default=1920)
     parser.add_argument("--height", help="Output renderer height",
                         type=int, default=1200)
+    parser.add_argument("--host", help="Output matelight host(name)",
+                        type=str, default="matelight")
+    parser.add_argument("--port", help="Output matelight port",
+                        type=int, default=1337)
     parser.add_argument("--program",
                         help="Load named router program from "
                              "~/.avio/router_*.json",
