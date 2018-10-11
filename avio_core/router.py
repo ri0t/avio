@@ -29,10 +29,11 @@ from circuits import Timer, Event
 
 from pprint import pprint
 
-routerevents = {'midicc': midicc,
-                'loadscene': loadscene,
-                'resetcclock': resetcclock
-                }
+routerevents = {
+    'midicc': midicc,
+    'loadscene': loadscene,
+    'resetcclock': resetcclock
+}
 
 
 class Router(AVIOComponent):
@@ -123,7 +124,7 @@ class Router(AVIOComponent):
         try:
             with open(realname, "w") as fp:
                 json.dump(self.scenes, fp, indent=4)
-        #except IOError as e:
+        # except IOError as e:
 
         except Exception as e:
             self.log("Program save failed for %s: %s (%s)" % (programname, e, type(e)))
@@ -171,6 +172,7 @@ class Router(AVIOComponent):
 
             if not cat:
                 self.log('Unknown category!', key, str_id)
+                return
 
             if not str_id in cat:
                 if str_id not in self.warned:
@@ -196,7 +198,7 @@ class Router(AVIOComponent):
                 signal = routerevents[route['event']](route['args'])
                 if 'mode' in route:
                     if (route['mode'] == 'down' and evtype == pygame.JOYBUTTONUP) or (
-                            route['mode'] == 'up' and evtype == pygame.JOYBUTTONDOWN):
+                                    route['mode'] == 'up' and evtype == pygame.JOYBUTTONDOWN):
                         self.log("Wrong mode for route: " + str(route))
                         return
                 if type(signal) == midicc:
