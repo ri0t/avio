@@ -5,6 +5,7 @@ import inspect
 import traceback
 from sys import exc_info
 
+
 class AVIOComponent(Component):
     debug = False
 
@@ -19,11 +20,10 @@ class AVIOComponent(Component):
         if uniquename in self.names:
             new_uniquename = uniquename
             while new_uniquename in self.names:
-                new_uniquename = uniquename + str(randint(2**16))
+                new_uniquename = uniquename + str(randint(2 ** 16))
             uniquename = new_uniquename
 
         self.uniquename = uniquename
-
 
     def log(self, *args, **kwargs):
         """Log a statement from this component"""
@@ -45,4 +45,3 @@ class AVIOComponent(Component):
             line_no
         )
         hfoslog(sourceloc=sourceloc, emitter=self.uniquename, *args, **kwargs)
-
