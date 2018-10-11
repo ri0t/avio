@@ -17,6 +17,7 @@
 
 __author__ = 'riot'
 
+import pygame
 from circuits import Event
 
 
@@ -93,3 +94,22 @@ class keypress(Event):
     def __init__(self, ev, *args):
         super(keypress, self).__init__(*args)
         self.ev = ev
+
+    def __repr__(self):
+
+        if len(self.channels) > 1:
+            channels = repr(self.channels)
+        elif len(self.channels) == 1:
+            channels = str(self.channels[0])
+        else:
+            channels = ""
+
+        data = "%s %s" % (
+            ", ".join(repr(arg) for arg in self.args),
+            ", ".join("%s=%s" % (k, repr(v)) for k, v in self.kwargs.items())
+        )
+
+        key = pygame.key.name(self.ev.key)
+        ev = self.ev
+
+        return "<%s_%s_%s[%s] (%s)>" % (self.name, key, ev, channels, data)
