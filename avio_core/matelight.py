@@ -36,6 +36,9 @@ class clear_ml(Event):
 class fade_out_ml(Event):
     pass
 
+class refresh_ml(Event):
+    pass
+
 
 class transmit_ml(Event):
     def __init__(self, frame, *args, **kwargs):
@@ -67,6 +70,7 @@ class Matelight(AVIOComponent):
 
         self.fade_timer = None
         self.init_timer = Timer(5, fade_out_ml()).register(self)
+        self.refresh_timer = Timer(1, refresh_ml(), persist=True).register(self)
 
     def started(self, *args):
         self.log("Starting matelight output on device %s:%i" % (self.host, self.port))
@@ -91,6 +95,10 @@ class Matelight(AVIOComponent):
 
     def clear_ml(self, event):
         self._clear()
+
+    @handler('refresh_ml')
+    def refresh_ml(self, event):
+        self._transmit(self.last_frame)
 
     def _transmit(self, image):
         self.log('Transmitting image, shape:', image.shape)
