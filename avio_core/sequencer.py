@@ -76,14 +76,18 @@ class Sequencer(AVIOComponent):
         step = self.steps[self.row][self.column][self.mode]
         mod = event.ev.mod
 
+        move = 1
+        if mod == 1:
+            move = 5
+
         if event.ev.key == pygame.K_RIGHT:
-            self.column += 1
+            self.column += move
         elif event.ev.key == pygame.K_LEFT:
-            self.column -= 1
+            self.column -= move
         elif event.ev.key == pygame.K_DOWN:
-            self.row += 1
+            self.row += move
         elif event.ev.key == pygame.K_UP:
-            self.row -= 1
+            self.row -= move
         elif event.ev.key == pygame.K_TAB:
             self.mode += 1
             self.mode = self.mode % 2
