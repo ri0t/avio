@@ -6,5 +6,8 @@ screeninfo==0.3
 # Video & CV
 #cv2 >= 2.4.9
 
+# Audio
+-e git+https://github.com/belangeo/pyo.git#egg=pyo
+
 # Compat
 six
