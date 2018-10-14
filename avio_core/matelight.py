@@ -26,6 +26,7 @@ import numpy as np
 from circuits import Event, Timer, handler
 
 from avio_core.component import AVIOComponent
+from avio_core.logger import verbose
 
 
 class clear_ml(Event):
@@ -34,19 +35,26 @@ class clear_ml(Event):
 
 
 class fade_out_ml(Event):
+    """Initiate hard fading out because of content loss or similar."""
     pass
 
+
 class refresh_ml(Event):
+    """Periodically sent last frame, so there's no idle-mode when there are no updated frames"""
     pass
 
 
 class transmit_ml(Event):
+    """Transmit a frame to the display"""
+
     def __init__(self, frame, *args, **kwargs):
         super(transmit_ml, self).__init__(*args, **kwargs)
         self.frame = frame
 
 
 class Matelight(AVIOComponent):
+    """Matelight connector with some minimal extra facilities"""
+
     channel = "matelight"
 
     def __init__(self, host="matelight", port=1337, *args):
@@ -57,8 +65,12 @@ class Matelight(AVIOComponent):
         self.port = port
 
         self.size = (40, 16)
+        self.gamma = 0.5
 
         self.fading = None
+
+        self.auto_restart = True
+        self.output_broken = False
 
         self.last_frame = np.zeros(self.size, np.uint8)
 
@@ -101,17 +113,30 @@ class Matelight(AVIOComponent):
         self._transmit(self.last_frame)
 
     def _transmit(self, image):
-        self.log('Transmitting image, shape:', image.shape)
-        ml_data = bytearray(image) + b"\00\00\00\00"
+        if self.output_broken and not self.auto_restart:
+            return
+
+        self.log('Transmitting image, shape:', image.shape, lvl=verbose)
+
         self.last_frame = image
-        # data_c = bytearray([x for x in list(ml_data)])
+
+        if self.gamma != 1:
+            image = (image * self.gamma).astype(np.uint8)
+
+        ml_data = bytearray(image) + b"\00\00\00\00"
+
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(ml_data, (self.host, self.port))
         except Exception as e:
-            self.log("Meeeh: ", e)
+            self.log("Error during matelight transmission: ", e)
+            self.output_broken = True
 
     def transmit_ml(self, event):
+        if self.fade_timer is not None:
+            self.fade_timer.unregister()
+            self.fade_timer = None
+
         self._transmit(event.frame)
 
     @handler('keypress')
@@ -119,3 +144,9 @@ class Matelight(AVIOComponent):
         if event.ev.key == 223 and event.ev.mod == 1:
             self._transmit(self.boot_image)
             Timer(2, fade_out_ml()).register(self)
+        if event.ev.mod & pygame.KMOD_LCTRL and event.ev.mod & pygame.KMOD_LSHIFT:
+            if event.ev.key == pygame.K_MINUS:
+                self.gamma = max(0.1, self.gamma - 0.1)
+            elif event.ev.key == pygame.K_PLUS:
+                self.gamma = min(1, self.gamma + 0.1)
+            self.log(self.gamma)
