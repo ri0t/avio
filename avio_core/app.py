@@ -150,7 +150,7 @@ def Launch(args):
                                  "read", "_read",
                                  "write", "_write",
                                  "stream_success", "stream_complete",
-                                 "stream"])
+                                 "stream", "refresh_ml"])
 
     input = Controller().register(app)
     router = Router(program=args.program).register(app)
