@@ -27,10 +27,12 @@ from circuits import Event, Timer, handler
 
 from avio_core.component import AVIOComponent
 from avio_core.matelight import transmit_ml
+from avio_core.logger import verbose
+from avio_core.events import midinote
 
 
 def to_rgb1(im):
-    # I think this will be slow
+    """Convert grayscale image to RGB"""
     w, h = im.shape
     ret = np.empty((w, h, 3), dtype=np.uint8)
     ret[:, :, 0] = im
@@ -41,34 +43,70 @@ def to_rgb1(im):
 
 class Sequencer(AVIOComponent):
     def __init__(self, channel="matelight", *args):
+        """Step sequencer"""
+
         super(Sequencer, self).__init__(*args)
         self.log("Initializing Sequencer component")
 
         self.channel = channel
+        self.midi_channel = 0
 
         self.size = (16, 40, 3)
-        self.frame = np.zeros(self.size, np.uint8)
+        self.matrix = self.frame = np.zeros(self.size, np.uint8)
+
         self.last_frame = None
+
+        self.step = 0
+        self.playing_row = 0
+        self.ppn = 0
 
         self.mode = self.column = self.row = 0
 
         self.steps = np.zeros(self.size, np.uint8)
 
+        self.default_note = 64
+
+        self.last_note = None
+
+        self.routing = {
+            0: 'note',
+            1: 'velocity',
+            2: 'channel'
+        }
+
     def started(self, *args):
         self.log("Starting Sequencer. Output to:", self.channel)
 
-    def _clear(self):
-        self.log('Clearing')
-        self.frame = np.zeros(self.size, np.uint8)
-        self._transmit()
-
-    def clear_ml(self, event):
-        self._clear()
-
     def _transmit(self):
-        self.log('Transmitting frame')
+        self.log('Transmitting frame', lvl=verbose)
         self.last_frame = self.frame
         self.fireEvent(transmit_ml(self.frame), self.channel)
+        self.frame = np.zeros(self.size, np.uint8)
+
+    def _send_step(self):
+        step = self.steps[self.playing_row][self.step]
+        if step[0] > 0:
+            self.fireEvent(midinote(step[0], step[1], self.midi_channel, step[2]))
+
+    @handler("midiinput")
+    def midi_input(self, event):
+        """Handles incoming midi data like clock"""
+
+        if event.code == 248:
+            self.ppn = self.ppn + 1
+            self.ppn %= 24
+            if self.debug:
+                print("#" if self.ppn == 0 else ".", end="", flush=True)
+            if self.ppn == 0:
+                self.step = (self.step + 1) % self.size[1]
+                self._send_step()
+                self._render()
+
+    def _render(self):
+        self.frame = to_rgb1(self.steps[:, :, self.mode])
+        self.frame[self.row][self.column] = [64, 196, 255]
+        self.frame[self.playing_row][self.step] = [196, 64, 64]
+        self._transmit()
 
     @handler("keypress")
     def keypress(self, event):
@@ -77,8 +115,21 @@ class Sequencer(AVIOComponent):
         mod = event.ev.mod
 
         move = 1
-        if mod == 1:
-            move = 5
+
+        matrix_changed = False
+        old_row = self.row
+        old_col = self.column
+
+        alt = mod & pygame.KMOD_LALT
+        lshift = mod & pygame.KMOD_LSHIFT
+        ctrl = mod & pygame.KMOD_LCTRL
+
+        # self.log('MODS:', alt, lshift, ctrl)
+
+        if alt:
+            move = 4
+        if ctrl:
+            move = move * 2
 
         if event.ev.key == pygame.K_RIGHT:
             self.column += move
@@ -90,15 +141,26 @@ class Sequencer(AVIOComponent):
             self.row -= move
         elif event.ev.key == pygame.K_TAB:
             self.mode += 1
-            self.mode = self.mode % 2
+            self.mode = self.mode % 3
+            matrix_changed = True
         elif event.ev.key == pygame.K_SPACE:
-            self.steps[self.row][self.column][self.mode] = 255 if step == 0 else 0
-        elif event.ev.key == pygame.K_PLUS:
+            if self.mode == 0:
+                value = self.default_note
+            elif self.mode == 1:
+                value = 127
+            elif self.mode == 2:
+                value = 16
+
+            self.steps[self.row][self.column][self.mode] = value
+            matrix_changed = True
+        elif event.ev.key == pygame.K_PLUS and mod == 0:
             value = step + 5 * ((1 + mod) * 5)
-            self.steps[self.row][self.column][self.mode] = min(value, 255)
-        elif event.ev.key == pygame.K_MINUS:
+            self.steps[self.row][self.column][self.mode] = min(value, 127)
+            matrix_changed = True
+        elif event.ev.key == pygame.K_MINUS and mod == 0:
             value = step - 5 * ((1 + mod) * 5)
             self.steps[self.row][self.column][self.mode] = max(value, 0)
+            matrix_changed = True
         elif event.ev.key == pygame.K_PRINT:
             for i in range(self.size[1]):
                 line = ""
@@ -110,9 +172,6 @@ class Sequencer(AVIOComponent):
         self.row = self.row % self.size[0]
         self.column = self.column % self.size[1]
 
-        matrix = self.steps[:, :, self.mode]
-        self.frame = to_rgb1(matrix)
-        self.log(self.frame.shape)
 
-        self.frame[self.row][self.column] = [64, 196, 255]
-        self._transmit()
+        if matrix_changed or (self.row != old_row or self.column != old_col):
+            self._render()
