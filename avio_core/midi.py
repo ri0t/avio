@@ -24,6 +24,7 @@ from circuits import Event, Timer
 
 from avio_core.component import AVIOComponent
 from avio_core.events import midiinput
+from avio_core.logger import verbose
 
 
 class MidiOutput(AVIOComponent):
@@ -31,9 +32,15 @@ class MidiOutput(AVIOComponent):
         super(MidiOutput, self).__init__(*args)
         self.log("Initializing midi output")
 
+        self.total_ppn = 0
+        self.ppn = 0
+
         self.output = pygame.midi.Output(deviceid, latency, buffer_size)
+        self.output.set_instrument(0, 0)
         self.deviceid = deviceid
         self.lastcc = {}
+
+        self.notes_playing = []
 
     def started(self, *args):
         self.log("Starting midi output on device " + str(self.deviceid))
@@ -53,6 +60,29 @@ class MidiOutput(AVIOComponent):
         self.lastcc[event.cc] = event.data
         self.output.write_short(0xb0, event.cc, event.data)
 
+    def midinote(self, event):
+        event.start = self.total_ppn
+        self.notes_playing.append(event)
+        self.log('Playing note:', event.note, 'on', event.midi_channel, lvl=verbose)
+        #self.output.note_on(event.note, event.velocity, event.midi_channel)
+        self.output.write_short(0x90, event.note, event.velocity)
+
+    def midiinput(self, event):
+        if event.code == 248:
+            self.total_ppn += 1
+            self.ppn += 1
+            self.ppn %= 24
+            removable = []
+            for note in self.notes_playing:
+                self.log('PPN:', note.start + note.length, self.total_ppn, note.start, note.length)
+                if note.start + note.length <= self.total_ppn:
+                    self.log('Note off again:', note.note, note.midi_channel)
+                    self.output.write_short(0x80, note.note, note.velocity)
+                    removable.append(note)
+
+            for item in removable:
+                self.notes_playing.remove(item)
+
     def resetcclock(self, event):
         self.log("Midi cc lock resetting")
         self.lastcc = {}
@@ -67,7 +97,7 @@ class MidiInput(AVIOComponent):
         self.deviceid = deviceid
         self.lastcc = {}
         self.delay = delay
-
+        self.ppn = 0
 
     def started(self, *args):
         """
@@ -86,7 +116,7 @@ class MidiInput(AVIOComponent):
                     mididata = mididata[0]
 
                 if self.debug:
-                    self.log(mididata)
+                    self.log(mididata, pretty=True)
 
                 self.fireEvent(midiinput(mididata))
 
