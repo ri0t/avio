@@ -67,7 +67,18 @@ class midicc(Event):
 class midiinput(Event):
     def __init__(self, data, *args):
         super(midiinput, self).__init__(*args)
+        self.code = data[0][0]
         self.data = data
+
+
+class midinote(Event):
+    def __init__(self, note, velocity, midi_channel, length=None, *args):
+        super(midinote, self).__init__(*args)
+        self.note = note
+        self.velocity = velocity
+        self.midi_channel = midi_channel
+        self.length = length
+        self.start = 0
 
 
 # Router events
