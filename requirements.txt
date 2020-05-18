@@ -8,6 +8,3 @@ screeninfo==0.3
 
 # Audio
 -e git+https://github.com/belangeo/pyo.git#egg=pyo
-
-# Compat
-six

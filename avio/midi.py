@@ -22,22 +22,41 @@ import pygame.midi
 
 from circuits import Event, Timer
 
-from avio_core.component import AVIOComponent
-from avio_core.events import midiinput
-from avio_core.logger import verbose
+from isomer.logger import verbose, warn
+from isomer.component import ConfigurableComponent, handler
+
+from avio.events import midiinput
 
 
-class MidiOutput(AVIOComponent):
-    def __init__(self, deviceid, latency=0, buffer_size=4096, *args):
-        super(MidiOutput, self).__init__(*args)
+class MidiOutput(ConfigurableComponent):
+    configprops = {
+        'deviceid': {
+            'type': 'number',
+            'default': 0
+        },
+        'latency': {
+            'type': 'number',
+            'default': 0
+        },
+        'buffer_size': {
+            'type': 'number',
+            'default': 4096
+        }
+    }
+
+    def __init__(self, *args):
+        super(MidiOutput, self).__init__("MIDIOUT", *args)
         self.log("Initializing midi output")
+
+        pygame.init()
+        pygame.midi.init()
+
+        self.output = None
 
         self.total_ppn = 0
         self.ppn = 0
 
-        self.output = pygame.midi.Output(deviceid, latency, buffer_size)
-        self.output.set_instrument(0, 0)
-        self.deviceid = deviceid
+        self.deviceid = self.config.deviceid
         self.lastcc = {}
 
         self.notes_playing = []
@@ -45,9 +64,13 @@ class MidiOutput(AVIOComponent):
     def started(self, *args):
         self.log("Starting midi output on device " + str(self.deviceid))
 
-    def midicc(self, event):
+        self.output = pygame.midi.Output(
+            self.config.deviceid, self.config.latency, self.config.buffer_size
+        )
+        self.output.set_instrument(0, 0)
 
-        #if not event.force and event.cc in self.lastcc:
+    def midicc(self, event):
+        # if not event.force and event.cc in self.lastcc:
         #    if abs(self.lastcc[event.cc] - event.data) > 20:
         #        #self.log("Not sending, due to too contrasting change")
         #        return
@@ -55,7 +78,8 @@ class MidiOutput(AVIOComponent):
         if event.cc in self.lastcc and self.lastcc[event.cc] == event.data:
             return
 
-        self.log("Midi cc signal received: %i -> %i (%s) " % (event.cc, event.data, event.force))
+        self.log("Midi cc signal received: %i -> %i (%s) " % (
+        event.cc, event.data, event.force))
 
         self.lastcc[event.cc] = event.data
         self.output.write_short(0xb0, event.cc, event.data)
@@ -64,7 +88,7 @@ class MidiOutput(AVIOComponent):
         event.start = self.total_ppn
         self.notes_playing.append(event)
         self.log('Playing note:', event.note, 'on', event.midi_channel, lvl=verbose)
-        #self.output.note_on(event.note, event.velocity, event.midi_channel)
+        # self.output.note_on(event.note, event.velocity, event.midi_channel)
         self.output.write_short(0x90, event.note, event.velocity)
 
     def midiinput(self, event):
@@ -74,7 +98,8 @@ class MidiOutput(AVIOComponent):
             self.ppn %= 24
             removable = []
             for note in self.notes_playing:
-                self.log('PPN:', note.start + note.length, self.total_ppn, note.start, note.length)
+                self.log('PPN:', note.start + note.length, self.total_ppn, note.start,
+                         note.length)
                 if note.start + note.length <= self.total_ppn:
                     self.log('Note off again:', note.note, note.midi_channel)
                     self.output.write_short(0x80, note.note, note.velocity)
@@ -88,25 +113,53 @@ class MidiOutput(AVIOComponent):
         self.lastcc = {}
 
 
-class MidiInput(AVIOComponent):
-    def __init__(self, deviceid, latency=0, delay=0.01, *args):
-        super(MidiInput, self).__init__(*args)
+class MidiInput(ConfigurableComponent):
+    configprops = {
+        'deviceid': {
+            'type': 'number',
+            'default': 0
+        },
+        'latency': {
+            'type': 'number',
+            'default': 0
+        },
+        'delay': {
+            'type': 'number',
+            'default': 0.01
+        }
+    }
+
+    def __init__(self, *args):
+        super(MidiInput, self).__init__("MIDIIN", *args)
         self.log("Initializing midi input")
 
-        self.input = pygame.midi.Input(deviceid, latency)
-        self.deviceid = deviceid
+        pygame.init()
+
+        self.input = None
+
         self.lastcc = {}
-        self.delay = delay
+
+        self.deviceid = self.config.deviceid
+        self.delay = self.config.delay
         self.ppn = 0
 
-    def started(self, *args):
-        """
-        """
-        self.log("Starting midi input on device " + str(self.deviceid) + " at %i Hz" % int(1 / self.delay))
-        Timer(self.delay, Event.create('peek'), self.channel, persist=True).register(self)
+    @handler("ready", channel="*")
+    def ready(self, *args):
+        self.log(
+            "Starting midi input on device " + str(self.deviceid) + " at %i Hz" % int(
+                1 / self.delay))
+
+        try:
+            self.input = pygame.midi.Input(self.config.deviceid, self.config.latency)
+
+            Timer(self.delay, Event.create('peek'), self.channel, persist=True).register(
+                self)
+        except pygame.midi.MidiException:
+            self.log("Could not open configured midi port:", self.config.deviceid,
+                     lvl=warn)
 
     def peek(self, event):
-        if self.input.poll():
+        if self.input and self.input.poll():
             while self.input.poll():
 
                 mididata = self.input.read(1)
@@ -119,4 +172,3 @@ class MidiInput(AVIOComponent):
                     self.log(mididata, pretty=True)
 
                 self.fireEvent(midiinput(mididata))
-

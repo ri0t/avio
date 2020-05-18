@@ -19,12 +19,13 @@ __author__ = 'riot'
 
 import pygame
 
-from circuits import Component, Timer, Event
+from circuits import Timer, Event
 
-from avio_core.component import AVIOComponent
-from avio_core.events import joystickchange, guiquit, guiresize, keypress
+from isomer.component import ConfigurableComponent, handler
+from avio.events import joystickchange, guiquit, guiresize, keypress
 
-from avio_core.gui import mouseevent
+# from avio.gui import mouseevent
+
 
 def getJoystick(no):
     joystick = pygame.joystick.Joystick(no)
@@ -61,17 +62,20 @@ def getJoystick(no):
     return {'name': name, 'axes': axes, 'buttons': buttons, 'hats': hats}
 
 
-class Controller(AVIOComponent):
-    """
-    """
+class HIDController(ConfigurableComponent):
+
+    channel = "AVIO"
 
     def __init__(self, delay=0.010, *args):
 
-        super(Controller, self).__init__(args)
-        self.log("Initializing controller")
+        super(HIDController, self).__init__("HIDCONTROLLER", args)
+        self.log("Initializing HID controller")
 
         self.delay = delay
         self.acting = True
+
+        pygame.init()
+        pygame.joystick.init()
 
         self.joystick_count = pygame.joystick.get_count()
         self.joysticks = {}
@@ -80,15 +84,15 @@ class Controller(AVIOComponent):
         for no in range(self.joystick_count):
             self.joysticks[no] = getJoystick(no)
 
-    def started(self, *args):
-        """
-        """
+        self.log("%i HID devices found" % self.joystick_count)
 
+    @handler("ready", channel="*")
+    def ready(self, *args):
         self.log("Starting controller input loop at %i Hz" % int(1 / self.delay))
         Timer(self.delay, Event.create('peek'), self.channel, persist=True).register(self)
 
+    @handler("peek")
     def peek(self, event):
-
         if pygame.event.peek():
             for event in pygame.event.get():
                 #self.log("EVENT:  " + str(event))
@@ -102,8 +106,8 @@ class Controller(AVIOComponent):
                         self.fireEvent(keypress(event))
                 elif event.type == pygame.VIDEORESIZE:
                     self.fireEvent(guiresize(event.w, event.h), "gui")
-                elif event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION):
-                    self.fireEvent(mouseevent(event), "gui")
+                # elif event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION):
+                #     self.fireEvent(mouseevent(event), "gui")
                 elif event.type in (pygame.JOYAXISMOTION,
                                   pygame.JOYHATMOTION,
                                   pygame.JOYBUTTONDOWN,
