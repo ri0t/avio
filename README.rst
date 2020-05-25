@@ -6,6 +6,14 @@ performance. AVIO stands for "Audio Visual Input Output" and the suite is
 a component (event) based agglomeration of tools to work with Controller,
 Midi, Audio and Visual data.
 
+Emergent Move
+=============
+
+This software suite will soon be migrated to a new module (Still "AVIO")
+for the `Isomer framework <https://github.com/isomeric/isomer>`__, to 
+add enhanced multimedia capabilities to the distributed application 
+framework.
+
 Installation
 ============
 
@@ -32,32 +40,33 @@ Then run:
 
  .. code-block:: bash
 
-    $ python setup.py install
+    python setup.py install
 
 If you prefer working safe and sane, use a virtualenvironment:
 
  .. code-block:: bash
 
-    $ virtualenv -p /usr/bin/python3 --system-site-packages avio
-    $ source avio/bin/activate
+    virtualenv -p /usr/bin/python3 --system-site-packages avio
+    source avio/bin/activate
 
 Or if you have (you should ;) virtualenvwrapper:
 
  .. code-block:: bash
 
-    $ mkvirtenv -p /usr/bin/python3 --system-site-packages avio
-    $ workon avio
+    mkvirtenv -p /usr/bin/python3 --system-site-packages avio
+    workon avio
 
 Saves that much typing. I heard, pip-env would be cool. Then install AVIO:
 
  .. code-block:: bash
 
-    $ pip install .
+    pip install .
 
 If you intend to develop on it, use:
 
  .. code-block:: bash
-    $ python setup.py develop
+ 
+    python setup.py develop
 
 Running
 =======
@@ -67,7 +76,7 @@ directory) and run it thus:
 
  .. code-block:: bash
 
-    $ ./avio
+    ./avio
 
 On the first start - or if there is no configuration at all - AVIO will
 create a configuration in ~/.avio
@@ -117,7 +126,8 @@ To actually use MIDI data e.g. in Bitwig Studio, you may need to
 load the alsa midi loopback module:
 
  .. code-block:: bash
-    $ sudo modprobe snd_virmidi
+    
+    sudo modprobe snd_virmidi
 
 This should enable four virtual loopback devices. With a tool like
 patchage, you can now route AVIO's output midi channel to a loopback
