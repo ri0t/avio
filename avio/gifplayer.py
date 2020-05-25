@@ -146,7 +146,7 @@ class GIFPlayer(ConfigurableComponent):
     }
     
     def __init__(self):
-        super(GIFPlayer, self).__init__()
+        super(GIFPlayer, self).__init__("GIFPLAYER")
 
         pygame.display.init()
 
@@ -195,7 +195,7 @@ class GIFPlayer(ConfigurableComponent):
             return
         try:
             # frames, durations, log = \
-            scale = (self.config.scale['width'], self.config.scale['height'])
+            scale = (self.config.scale['height'], self.config.scale['width'])
             data = self.config.filename, self.config.ignore_timings, scale
             self.fireEvent(
                 task(
@@ -253,7 +253,7 @@ class GIFPlayer(ConfigurableComponent):
 
         try:
             frame = self.frames[self.cur][0]
-            #self.log('Firing event')
+            #self.log('Firing event', frame)
             self.fireEvent(transmit_ml(frame), "matelight")
         except IndexError:
             pass

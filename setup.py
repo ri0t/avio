@@ -95,8 +95,10 @@ This software package is a plugin module for Isomer.
       midiinput=avio.midi:MidiInput
       midioutput=avio.midi:MidiOutput
       hidcontroller=avio.controller:HIDController
+      trigger=avio.trigger:Trigger
       combotrigger=avio.combotrigger:ComboTrigger
       gifplayer=avio.gifplayer:GIFPlayer
+      bpm=avio.bpm:BPM
       [isomer.management]
       [isomer.provisions]
     """,
