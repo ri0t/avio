@@ -17,6 +17,8 @@ framework.
 Installation
 ============
 
+Outdated! You'll need to install Isomer first. The docs will be updated, soon.
+
 Dependencies
 ------------
 
