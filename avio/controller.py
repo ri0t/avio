@@ -18,13 +18,23 @@
 __author__ = 'riot'
 
 import pygame
+import json
 
 from circuits import Timer, Event
 
-from isomer.component import ConfigurableComponent, handler
+from isomer.component import ConfigurableComponent, handler, authorized_event
+from isomer.events.client import broadcast
 from avio.events import joystickchange, guiquit, guiresize, keypress
 
 # from avio.gui import mouseevent
+
+
+class unsubscribe(authorized_event):
+    pass
+
+
+class subscribe(authorized_event):
+    pass
 
 
 def getJoystick(no):
@@ -64,6 +74,10 @@ def getJoystick(no):
 
 class HIDController(ConfigurableComponent):
 
+    configprops = {
+        'dead_center': {'type': 'number', 'default': 0.1},
+    }
+
     channel = "AVIO"
 
     def __init__(self, delay=0.010, *args):
@@ -73,6 +87,8 @@ class HIDController(ConfigurableComponent):
 
         self.delay = delay
         self.acting = True
+
+        self.clients = []
 
         pygame.init()
         pygame.joystick.init()
@@ -86,6 +102,59 @@ class HIDController(ConfigurableComponent):
 
         self.log("%i HID devices found" % self.joystick_count)
 
+    @handler(subscribe, channel="isomer-web")
+    def subscribe(self, event):
+        self.log("Subscription Event:", event.client)
+        if event.client.uuid not in self.clients:
+            self.clients.append(event.client.uuid)
+
+    @handler(unsubscribe, channel="isomer-web")
+    def unsubscribe(self, event):
+        self.log("Unsubscription Event:", event.client)
+        if event.client.uuid in self.clients:
+            self.clients.remove(event.client.uuid)
+
+    @handler("userlogout", channel="isomer-web")
+    def userlogout(self, event):
+        self.stop_client(event)
+
+    @handler("clientdisconnect", channel="isomer-web")
+    def clientdisconnect(self, event):
+        """Handler to deal with a possibly disconnected simulation frontend
+
+        :param event: ClientDisconnect Event
+        """
+
+        self.stop_client(event)
+
+    def stop_client(self, event):
+        try:
+            if event.clientuuid in self.clients:
+                self.clients.remove(event.clientuuid)
+
+                self.log("Remote simulator disconnected")
+            else:
+                self.log("Client not subscribed")
+        except Exception as e:
+            self.log("Strange thing while client disconnected", e, type(e))
+
+    def _notify_clients(self, event):
+        if len(self.clients) == 0:
+            return
+        # TODO: DIRTY HACK! DIIIIIRTY! REALLY DIRTY!
+        # <Event(7-JoyAxisMotion {'joy': 0, 'axis': 4, 'value': 0.2989593188268685})>"}
+        data = json.loads("{" + str(event).split("{")[1].rstrip(")>").replace("'", '"'))
+        data['action'] = str(event).split("-")[1].split(" ")[0]
+        message = {
+            'component': 'avio.controller',
+            'action': 'update',
+            'data': data
+        }
+        self.fireEvent(
+            broadcast("clientgroup", message, group=self.clients),
+            "isomer-web"
+        )
+
     @handler("ready", channel="*")
     def ready(self, *args):
         self.log("Starting controller input loop at %i Hz" % int(1 / self.delay))
@@ -97,22 +166,16 @@ class HIDController(ConfigurableComponent):
             for event in pygame.event.get():
                 #self.log("EVENT:  " + str(event))
 
-                if event == pygame.QUIT:
-                    self.fireEvent(guiquit("close"))
-                if event.type == pygame.KEYUP:
-                    if event.key == pygame.K_q:
-                        self.fireEvent(guiquit("key"))
-                    else:
-                        self.fireEvent(keypress(event))
-                elif event.type == pygame.VIDEORESIZE:
-                    self.fireEvent(guiresize(event.w, event.h), "gui")
-                # elif event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION):
-                #     self.fireEvent(mouseevent(event), "gui")
-                elif event.type in (pygame.JOYAXISMOTION,
+                if event.type in (pygame.JOYAXISMOTION,
                                   pygame.JOYHATMOTION,
                                   pygame.JOYBUTTONDOWN,
                                   pygame.JOYBUTTONUP,
                                   pygame.JOYBALLMOTION):
+                    if event.type in (pygame.JOYAXISMOTION,
+                                      pygame.JOYBALLMOTION):
+                        if abs(event.value) < self.config.dead_center:
+                            return
                     self.fireEvent(joystickchange(event))
+                    self._notify_clients(event)
 
 

@@ -99,6 +99,9 @@ This software package is a plugin module for Isomer.
       combotrigger=avio.combotrigger:ComboTrigger
       gifplayer=avio.gifplayer:GIFPlayer
       bpm=avio.bpm:BPM
+      videomixer=avio.videomixer:VideoMixer
+      library=avio.library:Library
+      gifmaster=avio.gifplayer:GIFMaster
       [isomer.management]
       [isomer.provisions]
     """,

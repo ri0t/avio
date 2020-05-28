@@ -1,21 +1,48 @@
 """Uses code adapted from 'GIFImage' by Matthew Roe"""
 
 import os
+import time
+
+import formal
 from PIL import Image
 from circuits import Worker, task, Timer
 import pygame
-from pygame.locals import *
-
-from isomer.component import ConfigurableComponent
+from isomer.component import ConfigurableComponent, LoggingComponent, handler, authorized_event
 from isomer.events.system import isomer_event
-from isomer.logger import error, verbose, warn
-from isomer.matelight import transmit_ml
+from isomer.events.client import broadcast, send
+from isomer.logger import verbose, warn, debug, hilight
+# from isomer.matelight import transmit_ml
 from isomer.debugger import cli_register_event
 
-import time
+from .videomixer import mix_image
+
 
 # def load_image(data):
 #     return [], [], 'Hello'
+
+
+class unsubscribe(authorized_event):
+    pass
+
+
+class subscribe(authorized_event):
+    pass
+
+
+class add_player(authorized_event):
+    pass
+
+
+class remove_player(authorized_event):
+    pass
+
+
+class get_data(authorized_event):
+    pass
+
+
+class change_player(authorized_event):
+    pass
 
 
 class render(isomer_event):
@@ -127,28 +154,169 @@ def load_image(data):
     return frames, durations, log
 
 
-class GIFPlayer(ConfigurableComponent):
-    """GIF Player with configurable output"""
-    
+class GIFMaster(ConfigurableComponent):
     configprops = {
-        'filename': {'type': 'string', 'default': ''},
-        'ignore_timings': {'type': 'boolean', 'default': False},
-        'immediately': {'type': 'boolean', 'default': True},
-        'scale': {
-            'type': 'object',
-            'properties': {
-                'width': {'type': 'integer', 'default': 40},
-                'height': {'type': 'integer', 'default': 16},
-            },
-            'default': {'width': 40, 'height': 16}
-        },
-        'delay': {'type': 'number', 'default': 1000/30.0}
+        'channels': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'id': 'gifplayersettings',
+                'name': 'gifplayersettings',
+                'properties': {
+                    'playing': {'type': 'boolean', 'default': False},
+                    'filename': {'type': 'string', 'default': ''},
+                    'ignore_timings': {'type': 'boolean', 'default': True},
+                    'immediately': {'type': 'boolean', 'default': True},
+                    'loop':  {'type': 'boolean', 'default': True},
+                    'bounce': {'type': 'boolean', 'default': False},
+                    'reverse': {'type': 'boolean', 'default': False},
+                    'bounds': {
+                        'type': 'object',
+                        'properties': {
+                            'start': {'type': 'number', 'default': 0},
+                            'stop': {'type': 'number', 'default': 1}
+                        },
+                        'default': {'start': 0, 'stop': 100}
+                    },
+                    'scale': {
+                        'type': 'object',
+                        'properties': {
+                            'width': {'type': 'integer', 'default': 40},
+                            'height': {'type': 'integer', 'default': 16},
+                        },
+                        'default': {'width': 40, 'height': 16}
+                    },
+                    'delay': {'type': 'number', 'default': 30.0},
+                    'channel': {'type': 'integer'}
+                },
+            }
+        }
     }
     
     def __init__(self):
-        super(GIFPlayer, self).__init__("GIFPLAYER")
+        super(GIFMaster, self).__init__("GIFMASTER")
+        
+        self.players = {}
+        self.player_model = formal.model_factory(self.configprops['channels']['items'])
+
+    @handler(add_player)
+    def add_player(self, event):
+
+        settings = self.player_model()
+
+        settings.filename = event.data['filename']
+        settings.channel = event.data['channel']
+
+        # TODO: This is not determinable here, so we have to take it from the gifplayer
+        settings.length = 0
+
+        gifplayer_settings = settings.serializablefields()
+        self.log(gifplayer_settings, pretty=True)
+        self._add_player(gifplayer_settings)
+
+        result = {
+            'component': 'avio.gifplayer',
+            'action': 'add_player',
+            'data': gifplayer_settings
+        }
+        self.fireEvent(send(event.client.uuid, result))
+
+    @handler(change_player)
+    def change_player(self, event):
+        self.log('Changing player:', event.data['channel'])
+        settings = self.player_model(event.data).serializablefields()
+        self.players[event.data['channel']].config = settings
+        self.players[event.data['channel']].update()
+
+        result = {
+            'component': 'avio.gifplayer',
+            'action': 'change_player',
+            'data': settings
+        }
+        self.fireEvent(send(event.client.uuid, result))
+
+    def _add_player(self, settings):
+        self.players[settings['channel']] = GIFPlayer(settings).register(self)
+
+
+    @handler(remove_player)
+    def remove_player(self, event):
+
+        player = self.players[int(event.data)]
+        self.players[int(event.data)] = None
+        player.stop()
+        player.unregister()
+        del player
+
+        result = {
+            'component': 'avio.gifplayer',
+            'action': 'remove_player',
+            'data': int(event.data)
+        }
+        self.fireEvent(send(event.client.uuid, result))
+
+    @handler(get_data, channel="isomer-web")
+    def get_data(self, event):
+        self.log("Providing mixer config:", event.client, pretty=True)
+        response = {
+            'component': 'avio.gifmaster',
+            'action': 'get_data',
+            'data': {
+                'schema': self.configprops['channels']['items'],
+                'config': self.config.serializablefields()
+            }
+        }
+        self.fireEvent(send(event.client.uuid, response), "isomer-web")
+
+    @handler(subscribe, channel="isomer-web")
+    def subscribe(self, event):
+        self.log("Subscription Event:", event.client)
+        if event.client.uuid not in self.players[event.data].clients:
+            self.players[event.data].clients.append(event.client.uuid)
+
+    @handler(unsubscribe, channel="isomer-web")
+    def unsubscribe(self, event):
+        self.log("Unsubscription Event:", event.client)
+        if event.client.uuid in self.players[event.data].clients:
+            self.players[event.data].clients.remove(event.client.uuid)
+
+    @handler("userlogout", channel="isomer-web")
+    def userlogout(self, event):
+        self.stop_client(event)
+
+    @handler("clientdisconnect", channel="isomer-web")
+    def clientdisconnect(self, event):
+        """Handler to deal with a possibly disconnected simulation frontend
+
+        :param event: ClientDisconnect Event
+        """
+
+        self.stop_client(event)
+
+    def stop_client(self, event):
+        try:
+            for player in self.players:
+                if event.clientuuid in player.clients:
+                    player.clients.remove(event.clientuuid)
+
+                    self.log("Remote simulator disconnected")
+                else:
+                    self.log("Client not subscribed")
+        except Exception as e:
+            self.log("Strange thing while client disconnected", e, type(e))
+
+
+class GIFPlayer(LoggingComponent):
+    """GIF Player with configurable output"""
+
+    def __init__(self, settings):
+        super(GIFPlayer, self).__init__()
+
+        self.log('Player initializing')
 
         pygame.display.init()
+        
+        self.config = settings
 
         self.factor = 1
 
@@ -157,9 +325,11 @@ class GIFPlayer(ConfigurableComponent):
         self.frames = []
         self.durations = []
 
+        self.clients = []
+
         self.timer = None
         self.worker = Worker(process=False, workers=2,
-                             channel="gifimport_"+self.uniquename).register(self)
+                             channel="gifimport_" + self.uniquename).register(self)
 
         # if transparency < 255:
         #    self.log('Setting alpha to %i' % transparency)
@@ -175,14 +345,31 @@ class GIFPlayer(ConfigurableComponent):
 
         self.fireEvent(cli_register_event("test_gifplayer", cli_test_gifplayer))
 
-        if self.config.immediately:
+        if self.config['immediately']:
             self.get_frames()
 
-    def cli_test_gifplayer(self, event):
-        self.log('Running test image')
-        self.config.filename = os.path.abspath(os.path.join(__file__, "../../test.gif"))
-        self.get_frames()
-        self.timer = Timer(self.config.delay / 1000.0, render(), persist=True).register(self)
+    def cli_test_gifplayer(self, *args):
+        if 'stop' in args:
+            self.log("Stopping test video")
+            self.stop()
+        else:
+            self.log('Running test video')
+            self.config['filename'] = os.path.abspath(
+                os.path.join(__file__, "../../test.gif"))
+            self.get_frames()
+            self.timer = Timer(self.config['delay'] / 1000.0, render(),
+                               persist=True).register(self)
+
+    def update(self):
+        self.log('Updating', self.playing, self.config['playing'])
+        if self.config['playing'] is True:
+            if self.playing is False:
+                self.log('Beginning playback')
+                self.play()
+        else:
+            if self.playing is True:
+                self.log('Beginning playback')
+                self.stop()
 
     def started(self, event, thing):
         self.log('Converting image')
@@ -190,18 +377,18 @@ class GIFPlayer(ConfigurableComponent):
 
     def get_frames(self):
         self.log('Getting frames')
-        if self.config.filename in (None, ""):
+        if self.config['filename'] in (None, ""):
             self.log('No filename, cannot load gif')
             return
         try:
             # frames, durations, log = \
-            scale = (self.config.scale['height'], self.config.scale['width'])
-            data = self.config.filename, self.config.ignore_timings, scale
+            scale = (self.config['scale']['height'], self.config['scale']['width'])
+            data = self.config['filename'], self.config['ignore_timings'], scale
             self.fireEvent(
                 task(
                     load_image, data
                 ),
-                "gifimport_"+self.uniquename)
+                "gifimport_" + self.uniquename)
             self.log('Worker started', lvl=verbose)
         except Exception as e:
             self.log("[GIF_WORKERS]", e, type(e), exc=True)
@@ -222,9 +409,7 @@ class GIFPlayer(ConfigurableComponent):
             self.durations = durations
 
             self.cur = 0
-            self.ptime = time.time()
 
-            self.playing = True
             self.breakpoint = len(self.frames) - 1
             self.startpoint = 0
             self.reversed = False
@@ -233,12 +418,14 @@ class GIFPlayer(ConfigurableComponent):
 
     def render(self):
         # pos = self.x, self.y
-        #self.log('Rendering %s' % self.config.filename, lvl=verbose)
+        # self.log('Rendering %s' % self.config['filename'], lvl=verbose)
 
         if self.playing:
             self.delta += time.time() - self.ptime
             if self.delta > self.frames[self.cur][1]:
+
                 while self.delta > self.frames[self.cur][1]:
+
                     self.delta -= self.frames[self.cur][1]
                     if self.reversed:
                         self.cur -= 1
@@ -249,14 +436,33 @@ class GIFPlayer(ConfigurableComponent):
                         if self.cur > self.breakpoint:
                             self.cur = self.startpoint
 
+                    if self.frames[self.cur][1] == 0:
+                        break
+
             self.ptime = time.time()
 
         try:
             frame = self.frames[self.cur][0]
-            #self.log('Firing event', frame)
-            self.fireEvent(transmit_ml(frame), "matelight")
+            # self.log('Firing event', frame)
+            if len(self.clients) > 0:
+                self._broadcast(frame)
+            self.fireEvent(mix_image(self.config['channel'], frame), "AVIO")
         except IndexError:
             pass
+
+    def _broadcast(self, frame):
+        message = {
+            'component': 'avio.gifplayer',
+            'action': 'frame_update',
+            'data': {
+                'channel': self.config['channel'],
+                'frame': frame.tolist()
+            }
+        }
+        self.fireEvent(
+            broadcast("clientgroup", message, group=self.clients),
+            "isomer-web"
+        )
 
     def set_speed(self, factor):
         self.log('Setting new speed: %f' % factor)
@@ -284,11 +490,21 @@ class GIFPlayer(ConfigurableComponent):
         self.startpoint = start
         self.breakpoint = end
 
-    def pause(self):
+    def stop(self):
+        self.log('Stop!', lvl=debug)
         self.playing = False
+        if self.timer is not None:
+            self.timer.stop()
+            self.timer.unregister()
+            self.timer = None
 
     def play(self):
+        self.log('Play!', lvl=debug)
         self.playing = True
+        if self.timer is None:
+            self.ptime = time.time()
+            self.timer = Timer(self.config['delay'] / 1000.0, render(),
+                               persist=True).register(self)
 
     def rewind(self):
         self.seek(0)
