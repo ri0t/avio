@@ -1,0 +1,47 @@
+.row {
+  height:16px;
+  min-height:16px;
+  max-height:16px;
+  margin: 0px;
+  padding: 0px;
+}
+
+.cell {
+  width: 16px;
+  min-width: 16px;
+  max-width: 16px;
+  display: inline-block;
+  background: black;
+  margin: 0px;
+  padding: 0px;
+}
+
+.small_row {
+  height:12px;
+  min-height:12px;
+  max-height:12px;
+  margin: 0px;
+  padding: 0px;
+}
+
+.small_cell {
+  width: 12px;
+  min-width: 12px;
+  max-width: 12px;
+  display: inline-block;
+  background: black;
+  margin: 0px;
+  padding: 0px;
+}
+
+.thumbnail img {
+  width: 100%;
+}
+
+.mode_active {
+  color: black;
+}
+
+.modes span {
+  color: gray;
+}
