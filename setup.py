@@ -88,7 +88,8 @@ This software package is a plugin module for Isomer.
         'isomer>=1.0',
         'isomer-camera>=0.0.1',
         'isomer-audio>=0.0.1',
-        'isomer-protocols>=0.0.1'
+        'isomer-protocols>=0.0.1',
+        'imageio>=2.8.0'
     ],
     entry_points="""[isomer.schemata]
       [isomer.components]
@@ -97,7 +98,6 @@ This software package is a plugin module for Isomer.
       hidcontroller=avio.controller:HIDController
       trigger=avio.trigger:Trigger
       combotrigger=avio.combotrigger:ComboTrigger
-      gifplayer=avio.gifplayer:GIFPlayer
       bpm=avio.bpm:BPM
       videomixer=avio.videomixer:VideoMixer
       library=avio.library:Library

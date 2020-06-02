@@ -108,6 +108,12 @@ class VideoMixer(ConfigurableComponent):
 
         self.stop_client(event)
 
+    @handler("reload_configuration", channel="isomer-web")
+    def reload_configuration(self, event):
+        """Reload the current configuration and set up everything depending on it"""
+
+        super().reload_configuration(event)
+
     @handler(get_data, channel="isomer-web")
     def get_data(self, event):
         self.log("Providing mixer config:", event.client, pretty=True)

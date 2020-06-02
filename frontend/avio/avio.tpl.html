@@ -10,9 +10,9 @@
             <span class="fa fa-stop"></span>
         </button>
 
-        <div ng-repeat="row in $ctrl.output track by $index" class="row">
+        <div ng-repeat="row in $ctrl.output track by $index" class="avio-row">
             <div ng-repeat="col in row track by $index"
-                 class="cell"
+                 class="avio-cell"
                  ng-style="$ctrl.getElementStyle(col)">
                 &nbsp;
             </div>
@@ -28,9 +28,9 @@
                     <H3>{{name}}</H3>
 
                     <div ng-repeat="row in $ctrl.player_frames track by $index"
-                         class="small_row">
+                         class="avio-small-row">
                         <div ng-repeat="col in row track by $index"
-                             class="small_cell"
+                             class="avio-small-cell"
                              ng-style="$ctrl.getElementStyle(col)">
                             &nbsp;
                         </div>
@@ -145,7 +145,7 @@
                 <div class="row">
                     <div class="col-xs-6 col-md-3"
                          ng-repeat="(video, item) in $ctrl.library.gif">
-                        <a class="thumbnail">
+                        <a class="thumbnail avio-thumbnail">
                             <img src="data:image/gif;base64,{{item.image}}">
                             <div class="caption">
                                 <h4>{{item.name}}</h4>
@@ -182,6 +182,9 @@
               sf-model="$ctrl.mixer_model"
               sf-options="$ctrl.mixer_formOptions">
         </form>
+        <button class="btn btn-success"
+                ng-click="$ctrl.update_mixer()"><i class="fa fa-check"></i>Store
+        </button>
     </div>
 
     <div class="well">

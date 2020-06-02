@@ -1,10 +1,13 @@
 # Basics
--e git+https://github.com/circuits/circuits.git#egg=circuits
 #pygame==1.9.1release
-screeninfo==0.3
+#screeninfo==0.3
+isomer>=1.0.10
+
 
 # Video & CV
-#cv2 >= 2.4.9
+#cv2>=2.4.9
+imageio>=2.8.0
+
 
 # Audio
 -e git+https://github.com/belangeo/pyo.git#egg=pyo

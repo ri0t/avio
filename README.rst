@@ -17,6 +17,17 @@ framework.
 Installation
 ============
 
+Dependencies
+------------
+
+apt-get install these:
+
+* liblo-dev
+* libportmidi-dev
+* libsndfile1-dev
+
+
+
 Outdated! You'll need to install Isomer first. The docs will be updated, soon.
 
 Dependencies

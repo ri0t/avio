@@ -1,4 +1,4 @@
-.row {
+.avio-row {
   height:16px;
   min-height:16px;
   max-height:16px;
@@ -6,7 +6,7 @@
   padding: 0px;
 }
 
-.cell {
+.avio-cell {
   width: 16px;
   min-width: 16px;
   max-width: 16px;
@@ -16,7 +16,7 @@
   padding: 0px;
 }
 
-.small_row {
+.avio-small-row {
   height:12px;
   min-height:12px;
   max-height:12px;
@@ -24,7 +24,7 @@
   padding: 0px;
 }
 
-.small_cell {
+.avio-small-cell {
   width: 12px;
   min-width: 12px;
   max-width: 12px;
@@ -34,14 +34,14 @@
   padding: 0px;
 }
 
-.thumbnail img {
+.avio-thumbnail img {
   width: 100%;
 }
 
-.mode_active {
+.avio-mode_active {
   color: black;
 }
 
-.modes span {
+.avio-modes span {
   color: gray;
 }

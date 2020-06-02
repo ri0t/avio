@@ -198,6 +198,15 @@ class aviocomponent {
             this.socket.send(request);
         }
 
+        this.update_mixer = function() {
+            console.log('[AVIO] Updating mixer', this.mixer_model);
+            this.socket.send({
+                component: 'isomer.ui.configurator',
+                action: 'put',
+                data: this.mixer_model
+            });
+        }
+
         this.switch_singleshot = function(player) {
             this.players[player].bounce = false;
             this.players[player].loop = false;
