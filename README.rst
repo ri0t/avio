@@ -6,131 +6,60 @@ performance. AVIO stands for "Audio Visual Input Output" and the suite is
 a component (event) based agglomeration of tools to work with Controller,
 Midi, Audio and Visual data.
 
-Emergent Move
-=============
-
-This software suite will soon be migrated to a new module (Still "AVIO")
-for the `Isomer framework <https://github.com/isomeric/isomer>`__, to 
-add enhanced multimedia capabilities to the distributed application 
-framework.
 
 Installation
 ============
 
+Since, AVIO is a plugin collection for Isomer, you'll need a working Isomer
+instance first.
+
+Isomer
+------
+
+To install Isomer and create an instance to work with AVIO, follow the
+`quick start tutorial <https://isomer.readthedocs.io/en/latest/start/index.html>`_.
+
+The quickest way to get AVIO is through Isomer's builtin store system, but that
+is not yet completely done, so right now, you'll have to do that manually:
+
 Dependencies
 ------------
 
-apt-get install these:
+Before installing AVIO, you should furthermore have these packages installed:
 
 * liblo-dev
 * libportmidi-dev
 * libsndfile1-dev
+* python3-pygame
+* python3-numpy
+* python3-opencv
 
-
-
-Outdated! You'll need to install Isomer first. The docs will be updated, soon.
-
-Dependencies
+Install AVIO
 ------------
 
-You should have these packages installed:
+Once you have set up Isomer correctly use this command line to install it into your
+default instance/environment:
 
- * python3.5
- * python3-pip
- * virtualenv
- * python3-pygame
- * python3-numpy
- * python3-opencv
+.. code-block:: bash
 
-AVIO
-----
+    iso -e current instance install-module -i -s github https://github.com/ri0t/avio
 
-The package will additionally require and install circuits, an event driven
-component framework with minimal overhead and a few other libraries that don't
-need distribution packages.
+This will (currently) require a frontend rebuild:
 
-Then run:
+.. code-block:: bash
 
- .. code-block:: bash
+   iso -e current environment install-frontend
 
-    python setup.py install
-
-If you prefer working safe and sane, use a virtualenvironment:
-
- .. code-block:: bash
-
-    virtualenv -p /usr/bin/python3 --system-site-packages avio
-    source avio/bin/activate
-
-Or if you have (you should ;) virtualenvwrapper:
-
- .. code-block:: bash
-
-    mkvirtenv -p /usr/bin/python3 --system-site-packages avio
-    workon avio
-
-Saves that much typing. I heard, pip-env would be cool. Then install AVIO:
-
- .. code-block:: bash
-
-    pip install .
-
-If you intend to develop on it, use:
-
- .. code-block:: bash
- 
-    python setup.py develop
+You can use `-i INSTANCENAME` and `-e ENVIRONMENTNAME` to specify which instance should
+be used.
 
 Running
 =======
 
-Activate your virtual environment as above, (change to the AVIO source
-directory) and run it thus:
-
- .. code-block:: bash
-
-    ./avio
-
-On the first start - or if there is no configuration at all - AVIO will
-create a configuration in ~/.avio
-
-You should edit the default router configuration to suit your controller
-and needs.
-A detailed explanation on how to write router scenes will follow.
-
-Arguments
-=========
-
-AVIO offers a few command line arguments:
-
-    -h                Display help text
-    --io              Display IO port tables for MIDI and Controllers
-    --mididev id      Select a midi device (pick one from the --io command)
-    --gui             Run the (experimental) GUI
-    --program name    Load router program configuration from ~/.avio/router_$name.json
-    --nosplash        Omit the splashscreen
+Restart your Isomer instance and log in to it, to access the AVIO modules.
 
 Controlling
 ===========
-
-Keyboard
---------
-
-The GUI window currently accepts these keystrokes:
-
- * q     Close the application (without asking)
- * F11   Take a screenshot
-
-More to come.
-
-The window (obviously) has to be active, to receive keystrokes.
-
-Joysticks & Gamepads
---------------------
-
-They are currently statically mapped. Only axes work.
-You can adjust the mapping in the router source code. This will be
-enhanced, it is (as almost everything here) WiP.
 
 MIDI
 ----
@@ -146,11 +75,41 @@ This should enable four virtual loopback devices. With a tool like
 patchage, you can now route AVIO's output midi channel to a loopback
 device, which you can select as MIDI input in BWS.
 
+Joysticks & Gamepads
+--------------------
+
+tbd
+
+User Interface
+--------------
+
+tbd
+
+Development
+===========
+
+First, you'll need `Isomer set up for development
+<https://isomer.readthedocs.io/en/latest/dev/general/environment.html>`_.
+
+Then, manually grab AVIO:
+
+.. code-block:: bash
+
+   git clone https://github.com/ri0t/avio avio
+
+Then run (probably best done in your Isomer virtual environment):
+
+ .. code-block:: bash
+
+    cd avio
+    python setup.py develop
+
+
 
 License
 =======
 
-Copyright (C) 2015-2018 riot <riot@c-base.org>
+Copyright (C) 2015-2020 riot <riot@c-base.org>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
