@@ -1,50 +1,89 @@
-<div class="container well">
-    <h1>AVIO - MatelightJockey</h1>
+<div class="jumbotron">
+    <div class="container">
+        <h1>AVIO - MatelightJockey</h1>
 
-    <div class="well">
-        <h2>Output</h2>
-        <button class="btn btn-success" ng-click="$ctrl.ml_subscribe()">
-            <span class="fa fa-play"></span>
-        </button>
-        <button class="btn btn-danger" ng-click="$ctrl.ml_unsubscribe()">
-            <span class="fa fa-stop"></span>
-        </button>
+        <ul>
+            <li>Step/Forward/etc anbändseln</li>
+            <li>Timeslider für current change korrekt anbändseln</li>
+            <li>Alpha-changes an Mixer schicken</li>
+            <li>Mix-Methoden</li>
+            <li>Realtime update für bounds/speed</li>
+            <li>Speed richtig rum anbändseln</li>
+            <li>Transparenzslider hochkant an Seite</li>
+            <li>Sync bounds to BPM</li>
+            <li>Filterbare library</li>
+            <li>Collapsible für medientypen</li>
+            <li>Textrenderer fertigbauen</li>
+            <li>Automatik-channels (mixer nimmt einfach an jeder channelnummer entgegen)</li>
+            <li>Hinzufügeknopf mit detail-ausklapp versehen
+                <ul>
+                    <li>Eingabefeld für alpha (vllt. nicht im ausklapp)</li>
+                    <li>Pausiert hinzufügen</li>
+                    <li>One shot - sofort</li>
+                    <li>Loop - sofort</li>
+                    <li>Beat-synchronisiert - sofort</li>
+                </ul>
+            </li>
+            <li>Hinzufügen zu nächstem freien kanal wenn kanalfeld leer</li>
+            <li>Zeit berechnen (auch in BPM)</li>
+            <li>Preview für Player fixen</li>
+            <li>Player auf canvas umbauen</li>
+            <li>Player auf 100% width</li>
+        </ul>
 
-        <div ng-repeat="row in $ctrl.output track by $index" class="avio-row">
-            <div ng-repeat="col in row track by $index"
-                 class="avio-cell"
-                 ng-style="$ctrl.getElementStyle(col)">
-                &nbsp;
+        <div class="well">
+            <h2>Output</h2>
+            <button class="btn btn-success" ng-click="$ctrl.ml_subscribe()">
+                <span class="fa fa-play"></span>
+            </button>
+            <button class="btn btn-danger" ng-click="$ctrl.ml_unsubscribe()">
+                <span class="fa fa-stop"></span>
+            </button>
+
+            <div ng-repeat="row in $ctrl.output track by $index" class="avio-row">
+                <div ng-repeat="col in row track by $index"
+                     class="avio-cell"
+                     ng-style="$ctrl.getElementStyle(col)">
+                    &nbsp;
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="well">
-        <h2>Video Players</h2>
+        <div class="well">
+            <h2>Video Players</h2>
 
-        <div class="container">
-            <div class="row">
-                <div ng-repeat="(name, player) in $ctrl.players" class="col-lg-6">
-                    <H3>{{name}}</H3>
-
-                    <div ng-repeat="row in $ctrl.player_frames track by $index"
-                         class="avio-small-row">
-                        <div ng-repeat="col in row track by $index"
-                             class="avio-small-cell"
-                             ng-style="$ctrl.getElementStyle(col)">
-                            &nbsp;
+            <div class="container">
+                <div class="row">
+                    <div ng-repeat="(name, player) in $ctrl.players" class="col-lg-6">
+                        <div>
+                            <H3>{{name}}</H3>
+                            <button class="btn btn-danger fa fa-times pull-right" style="font-size: 24px"
+                                    ng-click="$ctrl.remove_player(name)"></button>
                         </div>
-                    </div>
 
-                    <br>
+                        <div ng-repeat="row in $ctrl.player_frames[name] track by $index"
+                             class="avio-small-row">
+                            <div ng-repeat="col in row track by $index"
+                                 class="avio-small-cell"
+                                 ng-style="$ctrl.getElementStyle(col)">
+                                &nbsp;
+                            </div>
+                        </div>
 
-                    <span>
-                        {{$ctrl.library.gif[player.filename].name}}
-                        <button class="fa fa-times" style="font-size: 24px"
-                              ng-click="$ctrl.remove_player(name)"></button>
+                        <slider ng-model="$ctrl.player_current[player]"
+                                tooltip="hide"
+                                step="1"
+                                min="0"
+                                max="60">
+                        </slider>
                         <br>
-                        <span title="Length" class="fa fa-clock-o"></span> {{$ctrl.getDuration(player.length)}}|
-                        <span title="Speed" class="fa fa-tachometer"></span> {{player.delay | number:2}} %|
+
+                        <span>
+                        {{$ctrl.library.gif[player.filename].name}}
+
+                        <br>
+                        <span title="Length" class="fa fa-clock-o"></span> {{$ctrl.getDuration(name)}}|
+                        <span title="Speed" class="fa fa-tachometer"></span> {{player.delay | number:0}}ms|
                         <span class="modes">
                             <button class="btn btn-xs btn-default"
                                     title="Single Shot"
@@ -71,186 +110,230 @@
                             |
                         </span>
                         <span>
-                            {{player.bounds.start*100 |number}}:{{player.bounds.stop*100|number}} %
+                            {{player.bounds[0] | number:0}}:{{player.bounds[1] | number:0}} %
                         </span>
                     </span>
 
-                    <br>
+                        <br>
 
-                    <button class="btn btn-small"
-                            ng-class="{'btn-success': !player.playing,
-                                       'btn-warning': player.playing}"
-                            ng-click="$ctrl.toggle_player(name)">
+                        <button class="btn btn-small"
+                                ng-class="{'btn-success': !player.playing,
+                                           'btn-warning': player.playing}"
+                                ng-click="$ctrl.toggle_player(name)">
                         <span class="fa"
                               ng-class="{'fa-play': !player.playing,
                                          'fa-pause': player.playing}">
                         </span>
-                    </button>
-                    <button class="btn btn-small btn-danger"
-                            ng-click="$ctrl.stop_player(name)">
-                        <span class="fa fa-stop"></span>
-                    </button>
+                        </button>
+                        <button class="btn btn-small btn-danger"
+                                ng-click="$ctrl.stop_player(name)">
+                            <span class="fa fa-stop"></span>
+                        </button>
 
-                    <button class="btn btn-small btn-success"
-                            ng-click="$ctrl.fast_backward(name)">
-                        <span class="fa fa-fast-backward"></span>
-                    </button>
-                    <button class="btn btn-small btn-success"
-                            ng-click="$ctrl.backward(name)">
-                        <span class="fa fa-backward"></span>
-                    </button>
+                        <button class="btn btn-small btn-success"
+                                ng-click="$ctrl.fast_backward(name)">
+                            <span class="fa fa-fast-backward"></span>
+                        </button>
+                        <button class="btn btn-small btn-success"
+                                ng-click="$ctrl.backward(name)">
+                            <span class="fa fa-backward"></span>
+                        </button>
 
-                    <button class="btn btn-small btn-success"
-                            ng-click="$ctrl.step_backward(name)">
-                        <span class="fa fa-step-backward"></span>
-                    </button>
+                        <button class="btn btn-small btn-success"
+                                ng-click="$ctrl.step_backward(name)">
+                            <span class="fa fa-step-backward"></span>
+                        </button>
 
-                    <button class="btn btn-small btn-success"
-                            ng-click="$ctrl.step_forward(name)">
-                        <span class="fa fa-step-forward"></span>
-                    </button>
-                    <button class="btn btn-small btn-success"
-                            ng-click="$ctrl.forward(name)">
-                        <span class="fa fa-forward"></span>
-                    </button>
-                    <button class="btn btn-small btn-success"
-                            ng-click="$ctrl.fast_forward(name)">
-                        <span class="fa fa-fast-forward"></span>
-                    </button>
+                        <button class="btn btn-small btn-success"
+                                ng-click="$ctrl.step_forward(name)">
+                            <span class="fa fa-step-forward"></span>
+                        </button>
+                        <button class="btn btn-small btn-success"
+                                ng-click="$ctrl.forward(name)">
+                            <span class="fa fa-forward"></span>
+                        </button>
+                        <button class="btn btn-small btn-success"
+                                ng-click="$ctrl.fast_forward(name)">
+                            <span class="fa fa-fast-forward"></span>
+                        </button>
 
-                    <br>
-                    <slider ng-model="$ctrl.mixer[name].alpha"
-                            tooltip="hide"
-                            step="0.05"
-                            min="0"
-                            max="1">
-                    </slider>
+                        <br>
+                        
+                        <slider ng-model="$ctrl.mixer[name].alpha"
+                                tooltip="hide"
+                                step="0.05"
+                                min="0"
+                                max="1">
+                        </slider>
 
-                </div>
-            </div>
-        </div>
-    </div>
+                        <slider ng-model="player.delay"
+                                tooltip="hide"
+                                step="0.5"
+                                min="0"
+                                max="60">
+                        </slider>
 
-    <div class="well">
-        <h2 ng-click="(videos_collapsed = !videos_collapsed) && $ctrl.library_open()">
-            Videos
-            <span class="fa"
-                  ng-class="{'fa-caret-right': !videos_collapsed,
-                             'fa-caret-down': videos_collapsed}">
-            </span>
-        </h2>
+                        <slider ng-model="player.bounds"
+                                tooltip="hide"
+                                range="true"
+                                step="0.5"
+                                min="0"
+                                max="100">
+                        </slider>
 
-        <div ng-show="videos_collapsed">
-            <div class="container">
-                <div class="row">
-                    <div class="col-xs-6 col-md-3"
-                         ng-repeat="(video, item) in $ctrl.library.gif">
-                        <a class="thumbnail avio-thumbnail">
-                            <img src="data:image/gif;base64,{{item.image}}">
-                            <div class="caption">
-                                <h4>{{item.name}}</h4>
-                                <form>
-                                    <input type="number"
-                                           min="1"
-                                           max="$ctrl.channels + 1"
-                                           ng-model="slot_number">
-                                    <button ng-click="$ctrl.add_video(video, slot_number)"
-                                            class="btn btn-small btn-success">
-                                        <span class="fa fa-play"></span>
-                                    </button>
-                                </form>
-                            </div>
-                        </a>
 
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="well">
-        <h2 ng-click="mixer_collapsed = !mixer_collapsed">
-            Mixer
-            <span class="fa"
-                  ng-class="{'fa-caret-right': !mixer_collapsed,
+        <div class="well">
+            <h2 ng-click="(videos_collapsed = !videos_collapsed) && $ctrl.library_open()">
+                Videos
+                <span class="fa"
+                      ng-class="{'fa-caret-right': !videos_collapsed,
+                                 'fa-caret-down': videos_collapsed}">
+            </span>
+            </h2>
+
+            <div ng-show="videos_collapsed">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-6 col-md-3"
+                             ng-repeat="(video, item) in $ctrl.library.gif">
+                            <a class="thumbnail avio-thumbnail">
+                                <img src="data:image/gif;base64,{{item.image}}">
+                                <div class="caption">
+                                    <h4>{{item.name}}</h4>
+                                    <form>
+                                        <input type="number"
+                                               min="1"
+                                               max="$ctrl.channels + 1"
+                                               maxlength="3"
+                                               ng-model="slot_number">
+                                        <button ng-click="$ctrl.add_video(video, slot_number)"
+                                                class="btn btn-small btn-success">
+                                            <span class="fa fa-play"></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </a>
+
+                        </div>
+
+                        <div class="col-xs-6 col-md-3"
+                             ng-repeat="(font, item) in $ctrl.library.ttf"">
+                            <a class="thumbnail avio-thumbnail">
+                                <img src="data:image/jpg;base64,{{item.image}}">
+                                <div class="caption">
+                                    <h4>{{item.name}}</h4>
+                                    <form>
+                                        <input type="number"
+                                               min="1"
+                                               max="$ctrl.channels + 1"
+                                               maxlength="3"
+                                               ng-model="slot_number">
+                                        <input type="text" ng-model="render_text">
+                                        <button ng-click="$ctrl.add_video(font, render_text)"
+                                                class="btn btn-small btn-success">
+                                            <span class="fa fa-play"></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <h2 ng-click="mixer_collapsed = !mixer_collapsed">
+                Mixer
+                <span class="fa"
+                      ng-class="{'fa-caret-right': !mixer_collapsed,
                              'fa-caret-down': mixer_collapsed}">
             </span>
-        </h2>
+            </h2>
 
-        <form ng-show="mixer_collapsed" sf-schema="$ctrl.mixer_schema"
-              sf-form="$ctrl.mixer_form"
-              sf-model="$ctrl.mixer_model"
-              sf-options="$ctrl.mixer_formOptions">
-        </form>
-        <button class="btn btn-success"
-                ng-click="$ctrl.update_mixer()"><i class="fa fa-check"></i>Store
-        </button>
-    </div>
+            <form ng-show="mixer_collapsed" sf-schema="$ctrl.mixer_schema"
+                  sf-form="$ctrl.mixer_form"
+                  sf-model="$ctrl.mixer_model"
+                  sf-options="$ctrl.mixer_formOptions">
+            </form>
+            <button class="btn btn-success"
+                    ng-click="$ctrl.update_mixer()"><i class="fa fa-check"></i>Store
+            </button>
+        </div>
 
-    <div class="well">
-        <h2 ng-click="control_collapsed = !control_collapsed">
-            Control
-            <span class="fa"
-                  ng-class="{'fa-caret-right': !control_collapsed,
+        <div class="well">
+            <h2 ng-click="control_collapsed = !control_collapsed">
+                Control
+                <span class="fa"
+                      ng-class="{'fa-caret-right': !control_collapsed,
                              'fa-caret-down': control_collapsed}">
             </span>
-        </h2>
+            </h2>
 
-        <div ng-show="control_collapsed">
-            <div class="container">
-                <div class="row">
-                    <button class="btn btn-success" ng-click="$ctrl.ctl_subscribe()">
-                        <span class="fa fa-play"></span>
-                    </button>
-                    <button class="btn btn-danger" ng-click="$ctrl.ctl_unsubscribe()">
-                        <span class="fa fa-stop"></span>
-                    </button>
-                </div>
-                <br>
-                <div class="row">
-                    <button ng-repeat="(no, button) in $ctrl.buttons"
-                            class="btn btn-small btn-default"
-                            ng-class="{'active': button}">
-                        {{no}}
-                    </button>
-                </div>
-                <br>
-                <div class="row">
-                    <div class="col-md-6">
+            <div ng-show="control_collapsed">
+                <div class="container">
+                    <div class="row">
+                        <button class="btn btn-success"
+                                ng-click="$ctrl.ctl_subscribe()">
+                            <span class="fa fa-play"></span>
+                        </button>
+                        <button class="btn btn-danger"
+                                ng-click="$ctrl.ctl_unsubscribe()">
+                            <span class="fa fa-stop"></span>
+                        </button>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <button ng-repeat="(no, button) in $ctrl.buttons"
+                                class="btn btn-small btn-default"
+                                ng-class="{'active': button}">
+                            {{no}}
+                        </button>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6">
                         <pre>
                             {{$ctrl.control_data | json}}
                         </pre>
-                    </div>
-                    <div class="col-md-6">
+                        </div>
+                        <div class="col-md-6">
                         <pre>
                             {{$ctrl.axis_data | json}}
                         </pre>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div ng-repeat="(no, axis) in $ctrl.axes">
-                <slider ng-model="axis"
-                        tooltip="hide"
-                        step="0.05"
-                        min="-1"
-                        max="1">
-                </slider>
-            </div>
+                <div ng-repeat="(no, axis) in $ctrl.axes">
+                    <slider ng-model="axis"
+                            tooltip="hide"
+                            step="0.05"
+                            min="-1"
+                            max="1">
+                    </slider>
+                </div>
 
+            </div>
         </div>
-    </div>
 
-    <div class="well">
-        <h2 ng-click="graph_collapsed = !graph_collapsed">
-            Graph
-            <span class="fa"
-                  ng-class="{'fa-caret-right': !graph_collapsed,
+        <div class="well">
+            <h2 ng-click="graph_collapsed = !graph_collapsed">
+                Graph
+                <span class="fa"
+                      ng-class="{'fa-caret-right': !graph_collapsed,
                              'fa-caret-down': graph_collapsed}">
             </span>
-        </h2>
+            </h2>
 
-        <div ng-show="graph_collapsed">
+            <div ng-show="graph_collapsed">
+            </div>
         </div>
     </div>
 </div>

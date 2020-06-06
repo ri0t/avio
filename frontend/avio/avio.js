@@ -22,6 +22,7 @@ class aviocomponent {
             A: [],
             B: []
         }
+        this.player_current = {};
         this.control_data = "";
 
         for (let i=0; i <16; i++) {
@@ -173,7 +174,10 @@ class aviocomponent {
 
         this.video_update = function(msg) {
             if (msg.action === 'frame_update') {
-                self.player_frames[msg.data.channel] = msg.data.frame
+                self.players[msg.data.channel] = msg.data.config;
+                self.players[msg.data.channel].length = msg.data.length;
+                self.player_frames[msg.data.channel] = msg.data.frame;
+                self.player_current[msg.data.channel] = msg.data.current;
             } else if (msg.action === 'get_data') {
                 console.log('[AVIO] GIFMASTER:', msg.data)
             } else if (msg.action === 'add_player') {
@@ -305,9 +309,12 @@ class aviocomponent {
         return {background: "rgb(" + col[0] + ", " + col[1] + ", " + col[2] + ")"}
     }
 
-    getDuration(playtime) {
+    getDuration(name) {
         var date = new Date(null);
-        date.setSeconds(playtime);
+
+        let player = this.players[name];
+
+        date.setSeconds(player.length * player.delay);
         return date.toISOString().substr(11, 8);
     }
 }

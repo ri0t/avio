@@ -171,12 +171,10 @@ class GIFMaster(ConfigurableComponent):
                     'bounce': {'type': 'boolean', 'default': False},
                     'reverse': {'type': 'boolean', 'default': False},
                     'bounds': {
-                        'type': 'object',
-                        'properties': {
-                            'start': {'type': 'number', 'default': 0},
-                            'stop': {'type': 'number', 'default': 1}
-                        },
-                        'default': {'start': 0, 'stop': 100}
+                        'type': 'array',
+                        'items': {'type': 'number', 'default': 0},
+                        'maxItems': 2,
+                        'default': [0, 100]
                     },
                     'scale': {
                         'type': 'object',
@@ -225,8 +223,8 @@ class GIFMaster(ConfigurableComponent):
     def change_player(self, event):
         self.log('Changing player:', event.data['channel'])
         settings = self.player_model(event.data).serializablefields()
-        self.players[event.data['channel']].config = settings
-        self.players[event.data['channel']].update()
+
+        self.players[event.data['channel']].update(settings)
 
         result = {
             'component': 'avio.gifplayer',
@@ -236,8 +234,8 @@ class GIFMaster(ConfigurableComponent):
         self.fireEvent(send(event.client.uuid, result))
 
     def _add_player(self, settings):
-        self.players[settings['channel']] = GIFPlayer(settings).register(self)
-
+        new_player = GIFPlayer(settings).register(self)
+        self.players[settings['channel']] = new_player
 
     @handler(remove_player)
     def remove_player(self, event):
@@ -341,7 +339,8 @@ class GIFPlayer(LoggingComponent):
         self.playing = False
         self.breakpoint = 0
         self.startpoint = 0
-        self.reversed = False
+
+        self.direction = True
 
         self.fireEvent(cli_register_event("test_gifplayer", cli_test_gifplayer))
 
@@ -360,8 +359,16 @@ class GIFPlayer(LoggingComponent):
             self.timer = Timer(self.config['delay'] / 1000.0, render(),
                                persist=True).register(self)
 
-    def update(self):
+    def update(self, settings):
         self.log('Updating', self.playing, self.config['playing'])
+
+        if self.config['delay'] != settings['delay']:
+            self.set_speed(settings['delay'])
+        if self.config['bounds'] != settings['bounds']:
+            self.set_bounds(*settings['bounds'])
+
+        self.config = settings
+
         if self.config['playing'] is True:
             if self.playing is False:
                 self.log('Beginning playback')
@@ -412,7 +419,6 @@ class GIFPlayer(LoggingComponent):
 
             self.breakpoint = len(self.frames) - 1
             self.startpoint = 0
-            self.reversed = False
         else:
             self.log("No frames extracted:", log, lvl=warn)
 
@@ -423,18 +429,26 @@ class GIFPlayer(LoggingComponent):
         if self.playing:
             self.delta += time.time() - self.ptime
             if self.delta > self.frames[self.cur][1]:
-
+                # TODO: Rebuild this without loop, i.e. calculate the distance to jump
                 while self.delta > self.frames[self.cur][1]:
 
                     self.delta -= self.frames[self.cur][1]
-                    if self.reversed:
+                    if self.config['reverse'] or (self.config['bounce'] and self.direction == -1):
                         self.cur -= 1
                         if self.cur < self.startpoint:
                             self.cur = self.breakpoint
+                            if not self.config['loop']:
+                                self.stop()
+                            if self.config['bounce']:
+                                self.direction = +1
                     else:
                         self.cur += 1
                         if self.cur > self.breakpoint:
                             self.cur = self.startpoint
+                            if not self.config['loop']:
+                                self.stop()
+                            if self.config['bounce']:
+                                self.direction = -1
 
                     if self.frames[self.cur][1] == 0:
                         break
@@ -451,11 +465,16 @@ class GIFPlayer(LoggingComponent):
             pass
 
     def _broadcast(self, frame):
+        # TODO: Maybe only transmit necessary data, not statics like length or always
+        #  the whole config
         message = {
             'component': 'avio.gifplayer',
             'action': 'frame_update',
             'data': {
                 'channel': self.config['channel'],
+                'config': self.config,
+                'current': self.cur,
+                'length': self.breakpoint - self.startpoint,
                 'frame': frame.tolist()
             }
         }
@@ -477,18 +496,10 @@ class GIFPlayer(LoggingComponent):
             self.cur = len(self.frames) - 1
 
     def set_bounds(self, start, end):
-        if start < 0:
-            start = 0
-        if start >= len(self.frames):
-            start = len(self.frames) - 1
-        if end < 0:
-            end = 0
-        if end >= len(self.frames):
-            end = len(self.frames) - 1
-        if end < start:
-            end = start
-        self.startpoint = start
-        self.breakpoint = end
+        length = len(self.frames)
+        # TODO: I think, the outer min/max operations can be safely omitted
+        self.startpoint = max(0, int(length * (max(0, start) / 100.0)))
+        self.breakpoint = min(int(length * (min(100, end) / 100)), length) - 1
 
     def stop(self):
         self.log('Stop!', lvl=debug)
@@ -497,6 +508,7 @@ class GIFPlayer(LoggingComponent):
             self.timer.stop()
             self.timer.unregister()
             self.timer = None
+        self._broadcast(self.frames[self.cur][0])
 
     def play(self):
         self.log('Play!', lvl=debug)
